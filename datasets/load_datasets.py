@@ -3,6 +3,7 @@ import torchvision
 import os
 import numpy as np
 import matplotlib.pyplot as plt
+import torchvision.transforms as transforms
 
 
 def load_MNIST(root_path='.', download=False, transform=None):
@@ -13,7 +14,8 @@ def load_MNIST(root_path='.', download=False, transform=None):
     return mnist_data_train, mnist_data_test
 
 
-def load_CIFAR(root_path='./CIFAR-10', cls: int = 10, download=False, transform=None):
+def load_CIFAR(root_path='./CIFAR', cls: int = 10, download=False, transform=None):
+    root_path = f'{root_path}-{cls}'
     if not os.path.exists(root_path):
         os.mkdir(root_path)
     if cls == 10:
@@ -27,7 +29,13 @@ def load_CIFAR(root_path='./CIFAR-10', cls: int = 10, download=False, transform=
 
 if __name__ == '__main__':
     # train, test = load_MNIST(download=False)
-    train, test = load_CIFAR(download=False)
+    transform = transforms.Compose(
+        [
+            transforms.RandomHorizontalFlip(),
+            transforms.RandomGrayscale(),
+            transforms.ToTensor(),
+            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+    train, test = load_CIFAR(download=False, transform=transform)
     pic_0 = test.data[0]
     plt.imshow(pic_0)
     plt.show()
