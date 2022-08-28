@@ -31,7 +31,7 @@ if __name__ == '__main__':
     learning_rate = 1e-3
     optimizer = torch.optim.SGD(params=model.parameters(), lr=learning_rate)
 
-    train(train_loader, test_loader, model, epochs=10, criterion=criterion, optimizer=optimizer, device=device)
+    train(train_loader, test_loader, model, epochs=15, criterion=criterion, optimizer=optimizer, device=device)
     test(test_loader, model, criterion, device)
 
     # weight visualization
