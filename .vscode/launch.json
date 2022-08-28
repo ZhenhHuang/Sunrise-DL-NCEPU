@@ -8,7 +8,6 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "justMyCode": true,
-            "cwd": "${fileDirname}",
             "env": {
                 "PYTHONPATH": "${fileDirname};${workspaceFolder}"
             },
