@@ -50,3 +50,4 @@ def test(loader, model, criterion, device):
             result = torch.argmax(output, dim=-1)
             acc += (result == label).sum()
         print(f"test_loss: {np.mean(losses)}, accuracy: {acc/len(loader)*100: .2f}%, num={acc}")
+    return losses
