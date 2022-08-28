@@ -5,7 +5,7 @@ __pycache__/
 /.vscode/**
 
 #pycharm
-/.idea/**
+.idea/
 
 #Project
 /datasets/CIFAR-10/
