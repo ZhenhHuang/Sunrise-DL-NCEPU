@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
@@ -5,55 +6,7 @@ from datasets.load_datasets import load_CIFAR, load_MNIST
 from models.linear_models import LinearModel
 import torchvision.transforms as transforms
 import numpy as np
-
-
-def getDataLoader(dataset, batch_size=32, train: bool = True):
-    if train:
-        shuffle = True
-        drop_last = False
-    else:
-        shuffle = False
-        drop_last = False
-        batch_size = 1
-
-    loader = DataLoader(dataset, batch_size=batch_size, shuffle=shuffle, drop_last=drop_last)
-    return loader
-
-
-def train(train_loader, test_loader, model, epochs, criterion, optimizer, device):
-    model.train()
-    for iters in range(epochs):
-        losses = []
-        for i, (data, label) in enumerate(train_loader):
-            data = data.to(device)
-            label = label.to(device)
-
-            output = model(data)
-            loss = criterion(output, label)
-            losses.append(loss.item())
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
-            if i % 200 == 0:
-                print(f"iter {i}, loss: {loss.item()}")
-        print(f"epoch {iters}, train_loss: {np.mean(losses)}")
-        test(test_loader, model, criterion, device)
-
-
-def test(loader, model, criterion, device):
-    model.eval()
-    with torch.no_grad():
-        losses = []
-        acc = 0
-        for i, (data, label) in enumerate(loader):
-            data = data.to(device)
-            label = label.to(device)
-            output = model(data)
-            loss = criterion(output, label)
-            losses.append(loss.item())
-            result = torch.argmax(output, dim=-1)
-            acc += (result == label).sum()
-        print(f"test_loss: {np.mean(losses)}, accuracy: {acc/len(loader)*100: .2f}%, num={acc}")
+from image_classification.utils import getDataLoader, train, test
 
 
 if __name__ == '__main__':
@@ -64,13 +17,31 @@ if __name__ == '__main__':
             transforms.RandomHorizontalFlip(),
             transforms.RandomGrayscale(),
             transforms.ToTensor(),
-            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
-    trainset, testset = load_CIFAR(root_path="../datasets/CIFAR", transform=transform)
-    # trainset, testset = load_MNIST(root_path="../datasets", transform=transform, download=False)
+            transforms.Normalize((0.5), (0.5))])
+    # trainset, testset = load_CIFAR(root_path="../datasets/CIFAR", transform=transform, download=True)
+    trainset, testset = load_MNIST(root_path="../datasets", transform=transform, download=True)
     train_loader = getDataLoader(trainset)
     test_loader = getDataLoader(testset, train=False)
-    model = LinearModel(num_hidden=32*32*3, classes=10).to(device)
+    model = LinearModel(num_hidden=28*28, classes=10).to(device)
     criterion = nn.NLLLoss()
     optimizer = torch.optim.SGD(params=model.parameters(), lr=1e-4)
     train(train_loader, test_loader, model, epochs=10, criterion=criterion, optimizer=optimizer, device=device)
     test(test_loader, model, criterion, device)
+
+    # weight visualization
+    weight = model.linear.weight.detach().cpu().numpy()
+    print(weight.shape)
+    weight = weight.reshape(-1, 28, 28, 1)
+    N = weight.shape[0]
+    rows = 2
+    for i in range(N):
+        max_w = weight[i].max(0).max(0)[None, None, :]
+        min_w = weight[i].min(0).min(0)[None, None, :]
+        print(max_w.shape)
+        tmp = (weight[i] - min_w) / (max_w - min_w)
+        plt.subplot(N // rows, rows, i + 1)
+        plt.imshow(tmp, cmap='gray')
+    plt.show()
+
+
+
