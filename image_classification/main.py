@@ -19,6 +19,7 @@ if __name__ == '__main__':
             transforms.RandomGrayscale(),
             transforms.ToTensor(),
             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+
     trainset, testset = load_CIFAR(root_path="../datasets/CIFAR", transform=transform, download=False)
     # trainset, testset = load_MNIST(root_path="../datasets", transform=transform, download=True)
     train_loader = getDataLoader(trainset)
@@ -32,7 +33,7 @@ if __name__ == '__main__':
     learning_rate = 1e-3
     optimizer = torch.optim.SGD(params=model.parameters(), lr=learning_rate)
 
-    train(train_loader, test_loader, model, epochs=10, criterion=criterion, optimizer=optimizer, device=device)
+    train(train_loader, test_loader, model, epochs=15, criterion=criterion, optimizer=optimizer, device=device)
     test(test_loader, model, criterion, device)
 
     # weight visualization
