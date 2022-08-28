@@ -12,6 +12,7 @@
                 "PYTHONPATH": "${workspaceFolder}"
             },
             "redirectOutput": true,
+            "cwd": "${fileDirname}"
         }
     ]
 }
