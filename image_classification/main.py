@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
+import os
 from datasets.load_datasets import load_CIFAR, load_MNIST
 from models.linear_models import LinearModel
 from models.conv_models import ConvNet, ResNet18
