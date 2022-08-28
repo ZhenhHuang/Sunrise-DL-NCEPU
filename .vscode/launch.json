@@ -1,0 +1,12 @@
+{
+    "name": "Python: Current file",
+    "type": "python",
+    "request": "launch",
+    "program": "${file}",
+     "console": "integratedTerminal",
+     "justMyCode": true,
+     "env": {
+     "PYTHONPATH": "${workspaceFolder}"
+     },
+     "redirectOutput": true
+}
