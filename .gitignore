@@ -3,6 +3,7 @@ __pycache__/
 
 # vscode
 /.vscode/**
+!/.vscode/launch.json
 
 #pycharm
 .idea/
