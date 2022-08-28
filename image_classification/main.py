@@ -18,6 +18,7 @@ if __name__ == '__main__':
             transforms.RandomGrayscale(),
             transforms.ToTensor(),
             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+
     trainset, testset = load_CIFAR(root_path="../datasets/CIFAR", transform=transform, download=False)
     # trainset, testset = load_MNIST(root_path="../datasets", transform=transform, download=True)
     train_loader = getDataLoader(trainset)
