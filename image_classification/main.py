@@ -3,7 +3,7 @@ import torch
 import torch.nn as nn
 from datasets.load_datasets import load_CIFAR, load_MNIST
 from models.linear_models import LinearModel
-from models.conv_models import ConvNet
+from models.conv_models import ConvNet, ResNet18
 import torchvision.transforms as transforms
 import numpy as np
 from image_classification.utils import getDataLoader, train, test
@@ -24,7 +24,8 @@ if __name__ == '__main__':
     test_loader = getDataLoader(testset, train=False)
 
     # model = LinearModel(num_hidden=28*28, classes=10).to(device)
-    model = ConvNet(in_channel=3).to(device)
+    # model = ConvNet(in_channel=3).to(device)
+    model = ResNet18().to(device)
 
     criterion = nn.NLLLoss()
     learning_rate = 1e-3
