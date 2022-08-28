@@ -11,5 +11,6 @@ pip install -r requirements.txt
 or
 
 ```powershell
+cd Sunrise-DL-NCEPU
 conda env create -f dl.yaml
 ```
