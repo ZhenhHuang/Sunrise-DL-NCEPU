@@ -9,3 +9,4 @@ __pycache__/
 
 #Project
 /datasets/CIFAR-10/
+/datasets/MNIST
