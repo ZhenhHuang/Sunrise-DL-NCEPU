@@ -9,7 +9,8 @@ __pycache__/
 .idea/
 
 #Project
-/datasets/CIFAR-10/
-/datasets/MNIST
+/datasets/CIFAR-10/*
+/datasets/MNIST/*
 /datasets/*.zip
-/datasets/caltech101/
+/datasets/caltech101/*
+/datasets/PascalVOC2007/*
