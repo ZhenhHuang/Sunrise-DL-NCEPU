@@ -1,6 +1,5 @@
 from torch.utils.data import DataLoader, Dataset
 import torch
-import torchvision.transforms as transforms
 from xml.etree.ElementTree import parse as ET_parse
 import numpy as np
 from PIL import Image
