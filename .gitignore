@@ -12,3 +12,4 @@ __pycache__/
 /datasets/CIFAR-10/
 /datasets/MNIST
 /datasets/*.zip
+/datasets/caltech101/
