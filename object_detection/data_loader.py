@@ -5,10 +5,8 @@ from xml.etree.ElementTree import parse as ET_parse
 import numpy as np
 from PIL import Image
 import os
-from lxml import etree
 from xml.etree.ElementTree import Element
 import matplotlib.pyplot as plt
-import seaborn as sns
 import json
 
 
@@ -64,7 +62,7 @@ class VOCDataset(Dataset):
         target["iscrowd"] = iscrowd
 
         if self.transform is not None:
-            img = self.transform(img, target)
+            img, target = self.transform(img, target)
         return img, target
 
     def _get_xml_list(self):
@@ -99,8 +97,10 @@ class VOCDataset(Dataset):
 
 
 if __name__ == '__main__':
-    dataset = VOCDataset()
-    index = 10
+    import transforms as t
+    transform = t.Compose([t.ToTensor(), t.RandomHorizontalFlip(prob=0.)])
+    dataset = VOCDataset(transform=transform)
+    index = 9
     img, target = dataset[index]
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
@@ -108,7 +108,7 @@ if __name__ == '__main__':
         xmin, ymin, xmax, ymax = box
         rect = plt.Rectangle((xmin, ymin), xmax - xmin, ymax - ymin, fill=False, edgecolor='r')
         ax.add_patch(rect)
-    plt.imshow(transforms.ToTensor()(img).permute(1, 2, 0))
+    plt.imshow(img.permute(1, 2, 0))
     plt.show()
 
 
