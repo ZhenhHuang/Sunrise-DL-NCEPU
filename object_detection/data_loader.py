@@ -7,11 +7,13 @@ import os
 from xml.etree.ElementTree import Element
 import matplotlib.pyplot as plt
 import json
+from utils import target_encode
 
 
 class VOCDataset(Dataset):
     def __init__(self, root_path=r"C:\Users\98311\Downloads\VOCtrainval_06-Nov-2007\VOCdevkit",
-                 year=2007, flag="train", transform=None, json_file='../datasets/PascalVOC2007/pascal_classes_2007.json'):
+                 year=2007, flag="train", transform=None, json_file='../datasets/PascalVOC2007/pascal_classes_2007.json',
+                 S=7, B=2):
         super(VOCDataset, self).__init__()
         assert flag in ['train', 'val']
         self.root_path = f"{root_path}\VOC{year}"
@@ -24,6 +26,8 @@ class VOCDataset(Dataset):
         self.map_dict = json.load(f)
         f.close()
         self.transform = transform
+        self.S = S
+        self.B = B
 
     def __len__(self):
         return len(self.xml_list)
@@ -62,6 +66,9 @@ class VOCDataset(Dataset):
 
         if self.transform is not None:
             img, target = self.transform(img, target)
+        _, H, W = img.shape
+        target = target_encode(target, self.S, self.B, len(self.map_dict), H, W)
+
         return img, target
 
     def _get_xml_list(self):
@@ -97,18 +104,21 @@ class VOCDataset(Dataset):
 
 if __name__ == '__main__':
     import transforms as t
-    transform = t.Compose([t.ToTensor(), t.RandomHorizontalFlip(prob=0.)])
+    transform = t.Compose([t.ToTensor(), t.RandomHorizontalFlip(prob=0.), t.Resize((224, 224))])
     dataset = VOCDataset(transform=transform)
-    index = 9
+    index = 1
     img, target = dataset[index]
-    fig = plt.figure()
-    ax = fig.add_subplot(1, 1, 1)
-    for box in target['boxes']:
-        xmin, ymin, xmax, ymax = box
-        rect = plt.Rectangle((xmin, ymin), xmax - xmin, ymax - ymin, fill=False, edgecolor='r')
-        ax.add_patch(rect)
-    plt.imshow(img.permute(1, 2, 0))
-    plt.show()
+    loader = DataLoader(dataset, batch_size=3)
+    for i, (data, target) in enumerate(loader):
+        break
+    # fig = plt.figure()
+    # ax = fig.add_subplot(1, 1, 1)
+    # for box in target['boxes']:
+    #     xmin, ymin, xmax, ymax = box
+    #     rect = plt.Rectangle((xmin, ymin), xmax - xmin, ymax - ymin, fill=False, edgecolor='r')
+    #     ax.add_patch(rect)
+    # plt.imshow(img.permute(1, 2, 0))
+    # plt.show()
 
 
 

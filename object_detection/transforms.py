@@ -24,6 +24,30 @@ class RandomHorizontalFlip:
         return image, target
 
 
+class Resize:
+    def __init__(self, size):
+        self.size = size
+
+    def __call__(self, image, target):
+        _, H, W = image.shape
+        image = F.resize(image, size=self.size)
+        bbox = target["boxes"]
+        bbox[:, [1, 3]] *= self.size[0] / H
+        bbox[:, [0, 2]] *= self.size[1] / W
+        target['boxes'] = bbox
+        return image, target
+
+
+class Normalize:
+    def __init__(self, mean, std):
+        self.mean = mean
+        self.std = std
+
+    def __call__(self, image, target):
+        image = F.normalize(image, self.mean, self.std)
+        return image, target
+
+
 class Compose:
     def __init__(self, transforms):
         self.transfoms = transforms
@@ -32,3 +56,6 @@ class Compose:
         for t in self.transfoms:
             image, target = t(image, target)
         return image, target
+
+
+
