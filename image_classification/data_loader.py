@@ -180,18 +180,3 @@ def getLoader(args, flag):
     data_loader = DataLoader(dataset, batch_size=batch_size, shuffle=shuffle, drop_last=drop_last)
     return dataset, data_loader
 
-
-if __name__ == '__main__':
-    flag = 'test'
-    dataset = Caltech101(flag=flag, abandon=False)
-    img1 = cv2.imshow("demo", dataset.data[0])
-    key = cv2.waitKey(0)
-    # labels = dataset.label
-    # count_dict = {}
-    # for i in labels:
-    #     count_dict[i] = count_dict.get(i, 0) + 1
-    # import matplotlib.pyplot as plt
-    #
-    # plt.title(flag)
-    # plt.bar(np.arange(102), list(count_dict.values()))
-    # plt.show()

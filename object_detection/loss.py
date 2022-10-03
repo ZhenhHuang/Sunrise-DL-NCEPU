@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from utils import calc_IoU
+from object_detection.utils import calc_IoU
 
 
 class YOLOLoss(nn.Module):
@@ -67,7 +67,6 @@ class YOLOLoss(nn.Module):
         loss_noobj = F.mse_loss(pred_noobj[:, [4 + b * 5 for b in range(self.B)]],
                                 true_noobj[:, [4 + b * 5 for b in range(self.B)]], reduction='sum')
         return loss_noobj
-
 
 
 
