@@ -82,7 +82,8 @@ class YOLO_V1(nn.Module):
             nn.Linear(self.backbone.in_features, 4096),
             nn.Dropout(dropout),
             nn.LeakyReLU(0.1),
-            nn.Linear(4096, S**2 * (5 * B + num_classes))
+            nn.Linear(4096, S**2 * (5 * B + num_classes)),
+            nn.Sigmoid()
         )
 
     def forward(self, x):
@@ -93,7 +94,6 @@ class YOLO_V1(nn.Module):
     def _choose_backbone(self, backbone: str):
         if backbone == 'darknet':
             return DarkNet()
-
 
 
 if __name__ == '__main__':

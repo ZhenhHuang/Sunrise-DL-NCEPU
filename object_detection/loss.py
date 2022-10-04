@@ -52,8 +52,8 @@ class YOLOLoss(nn.Module):
         box_pred_response = box_pred[response_mask].reshape(-1, 5)
         box_true_response = box_true[response_mask].reshape(-1, 5)
         loss_xy = F.mse_loss(box_pred_response[:, :2], box_true_response[:, :2], reduction='sum')
-        loss_wh = F.mse_loss(box_pred_response[:, 2:].sqrt(), box_true_response[:, 2:].sqrt(), reduction='sum')
-        loss_obj = F.mse_loss(box_pred_response[:, 4], target_iou, reduction='sum')
+        loss_wh = F.mse_loss(box_pred_response[:, 2:4].sqrt(), box_true_response[:, 2:4].sqrt(), reduction='sum')
+        loss_obj = F.mse_loss(box_pred_response[:, 4], target_iou[response_mask], reduction='sum')
         loss_class = F.mse_loss(cls_pred, cls_true, reduction='sum')
 
         loss = self.w_coord * (loss_xy + loss_wh) + loss_obj + self.w_noobj * loss_noobj + loss_class
@@ -69,5 +69,11 @@ class YOLOLoss(nn.Module):
         return loss_noobj
 
 
+if __name__ == '__main__':
+    loss = YOLOLoss()
+    x = torch.randn(32, 7, 7, 30)
+    y = torch.randn(32, 7, 7, 30)
+    output = loss(x, y)
+    print(output.shape)
 
 

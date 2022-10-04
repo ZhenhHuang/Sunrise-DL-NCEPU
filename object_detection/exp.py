@@ -32,7 +32,7 @@ def train(args, model, device):
             target = target.float().to(device)
             output = model(image)
             loss = criterion(output, target)
-            train_losses.append(loss)
+            train_losses.append(loss.item())
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()

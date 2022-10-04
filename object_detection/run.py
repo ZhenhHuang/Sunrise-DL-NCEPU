@@ -23,7 +23,7 @@ parser.add_argument('--S', type=int, default=7, help='grids of image to split')
 parser.add_argument('--B', type=int, default=2, help='boxes number for each grid')
 
 # dataloader
-parser.add_argument('--batch_size', type=int, default=32, help='batch size of dataloader')
+parser.add_argument('--batch_size', type=int, default=3, help='batch size of dataloader')
 parser.add_argument('--num_workers', type=int, default=8, help='how many subprocesses to use for data loading')
 
 # model
@@ -67,3 +67,4 @@ if __name__ == '__main__':
     print(f'backbone: {args.backbone}')
     model = YOLO_V1(args.backbone, 7, 2, 20).to(device)
     train(args, model, device)
+    torch.cuda.empty_cache()
