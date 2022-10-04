@@ -1,22 +1,23 @@
 import torch
 from utils import target_decode
-from data_loader import data_factory
+from data_loader import data_factory, VOCDataset
 from tools import visualize
 from torchvision.transforms import Normalize
 
 
 def detect(args, model, device):
     print("----------loading test set--------")
-    test_set, test_loader = data_factory(args, flag='test')
+    _, test_loader = data_factory(args, flag='test')
+    test_set = VOCDataset(flag='test')
     model.load_state_dict(torch.load(f"./checkpoints/{args.model_path}"))
     model.eval()
     with torch.no_grad():
         for i, (image, target) in enumerate(test_loader):
             image = image.float().to(device)
-            # target = target.float().to(device)
+            target = target.float().to(device)
             output = model(image).cpu()
             box_corner, class_label, confidence, class_score = \
-                target_decode(output.squeeze(0), args.threshold, args.S, args.B)
+                target_decode(target.cpu().squeeze(0), args.threshold, args.S, args.B)
             box_corner = box_corner * args.size[0]
             image = image.cpu().squeeze(0)
             class_label = class_label.cpu().numpy()

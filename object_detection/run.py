@@ -25,7 +25,7 @@ parser.add_argument('--B', type=int, default=2, help='boxes number for each grid
 parser.add_argument('--batch_size', type=int, default=16, help='batch size of dataloader')
 parser.add_argument('--num_workers', type=int, default=0, help='how many subprocesses to use for data loading')
 parser.add_argument('--size', type=list, default=[448, 448])
-parser.add_argument('--threshold', type=float, default=0.05)
+parser.add_argument('--threshold', type=float, default=0.5)
 
 # model
 parser.add_argument('--dropout', type=float, default=0.5, help='dropout after the first connected layer')
@@ -65,16 +65,16 @@ if __name__ == '__main__':
     from models.yolo_v1 import YOLO_V1, Reshape
     from detect import detect
     from loss import YOLOLoss
-    from torchvision.models import resnet50
+    from torchvision.models import resnet50, vgg11
     print(args)
     device = torch.device('cuda:0') if torch.cuda.is_available() and args.use_gpu else torch.device('cpu')
     print(device)
     print(f'backbone: {args.backbone}')
     # model = YOLO_V1(args.backbone, 7, 2, 20).to(device)
-    model = resnet50(pretrained=True).to(device)
-    in_features = model.fc.in_features
-    model.fc = torch.nn.Sequential(torch.nn.Linear(in_features, 1470),
-                                   torch.nn.Sigmoid(), Reshape([-1, 7, 7, 30])).to(device)
+    model = vgg11(weights=True).to(device)
+    in_features = 25088
+    model.classifier = torch.nn.Sequential(torch.nn.Linear(in_features, 1470),
+                                           torch.nn.Sigmoid(), Reshape([-1, 7, 7, 30])).to(device)
     # train(args, model, device)
     detect(args, model, device)
 
