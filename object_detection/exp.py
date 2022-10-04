@@ -51,17 +51,17 @@ def train(args, model, device):
         if early_stopping.early_stop:
             print('Early stopping')
             break
-        adjust_learning_rate(epoch, args)
+        adjust_learning_rate(optimizer, epoch, args)
 
 
 def valid(valid_loader, model, criterion, device):
     model.eval()
     losses = []
     with torch.no_grad():
-        for i, (data, target) in enumerate(valid_loader):
-            data = data.float().to(device)
+        for i, (image, target) in enumerate(valid_loader):
+            image = image.float().to(device)
             target = target.float().to(device)
-            output = model(data)
+            output = model(image)
             loss = criterion(output, target)
             losses.append(loss.detach().cpu().numpy())
     model.train()

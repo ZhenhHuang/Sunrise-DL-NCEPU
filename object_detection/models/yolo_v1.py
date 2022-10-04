@@ -7,10 +7,11 @@ class ConvBlock(nn.Module):
     def __init__(self, c_in, c_out, kernel_size, stride, padding):
         super(ConvBlock, self).__init__()
         self.conv = nn.Conv2d(c_in, c_out, kernel_size, stride, padding)
-        self.norm = nn.BatchNorm2d(c_out)
+        self.activation = nn.LeakyReLU(0.1, inplace=True)
+        # self.norm = nn.BatchNorm2d(c_out)
 
     def forward(self, x):
-        return F.leaky_relu(self.norm(self.conv(x)), 0.1)
+        return self.activation(self.conv(x))
 
 
 class DarkNet(nn.Module):
@@ -98,6 +99,7 @@ class YOLO_V1(nn.Module):
 
 if __name__ == '__main__':
     model = YOLO_V1('darknet', 7, 2, 20)
-    x = torch.randn(1, 3, 448, 448)
+    # model = DarkNet()
+    x = torch.randn(32, 3, 448, 448)
     out = model(x)
     print(out.shape)

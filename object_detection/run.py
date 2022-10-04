@@ -16,15 +16,15 @@ parser = argparse.ArgumentParser(description="object detection")
 parser.add_argument('--data', type=str, default='VOC', help='name of dataset')
 parser.add_argument('--root_path', type=str, default="C:/Users/98311/Downloads", help='root path of dataset')
 parser.add_argument('--year', type=int, default=2007, help='year of VOC dataset')
-parser.add_argument('--flag', type=str, default='train', help='train flag of dataset')
 parser.add_argument('--json_file', type=str, default='../datasets/PascalVOC2007/pascal_classes_2007.json',
                     help="json file of class mapping")
 parser.add_argument('--S', type=int, default=7, help='grids of image to split')
 parser.add_argument('--B', type=int, default=2, help='boxes number for each grid')
 
 # dataloader
-parser.add_argument('--batch_size', type=int, default=3, help='batch size of dataloader')
-parser.add_argument('--num_workers', type=int, default=8, help='how many subprocesses to use for data loading')
+parser.add_argument('--batch_size', type=int, default=16, help='batch size of dataloader')
+parser.add_argument('--num_workers', type=int, default=0, help='how many subprocesses to use for data loading')
+parser.add_argument('--size', type=list, default=[112, 112])
 
 # model
 parser.add_argument('--dropout', type=float, default=0.5, help='dropout after the first connected layer')
@@ -59,12 +59,22 @@ parser.add_argument('--model_path', type=str, default='model.pt', help='path for
 args = parser.parse_args()
 
 if __name__ == '__main__':
-    from exp import train
-    from models.yolov1.model import YOLO_V1
+    from exp import train, valid
+    from data_loader import data_factory
+    from models.yolo_v1 import YOLO_V1
+    from loss import YOLOLoss
     print(args)
     device = torch.device('cuda:0') if torch.cuda.is_available() and args.use_gpu else torch.device('cpu')
     print(device)
     print(f'backbone: {args.backbone}')
     model = YOLO_V1(args.backbone, 7, 2, 20).to(device)
-    train(args, model, device)
-    torch.cuda.empty_cache()
+    # train(args, model, device)
+    # torch.cuda.empty_cache()
+    # print("----------loading train set-------")
+    # train_set, train_loader = data_factory(args, flag='train')
+    print("----------loading valid set-------")
+    valid_set, valid_loader = data_factory(args, flag='val')
+    print("----------loading test set--------")
+    test_set, test_loader = data_factory(args, flag='test')
+    loss = valid(valid_loader, model, YOLOLoss(), device)
+    loss2 = valid(test_loader, model, YOLOLoss(), device)

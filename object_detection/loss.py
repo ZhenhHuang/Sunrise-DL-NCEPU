@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from object_detection.utils import calc_IoU
+from utils import calc_IoU
 
 
 class YOLOLoss(nn.Module):

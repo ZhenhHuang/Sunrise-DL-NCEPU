@@ -11,13 +11,13 @@ import transforms as t
 
 
 class VOCDataset(Dataset):
-    def __init__(self, root_path=r"C:\Users\98311\Downloads",
+    def __init__(self, root_path="C:/Users/98311/Downloads",
                  year=2007, flag="train", transform=None, json_file='../datasets/PascalVOC2007/pascal_classes_2007.json',
                  S=7, B=2, **kwargs):
         super(VOCDataset, self).__init__()
         assert flag in ['train', 'val', 'test']
         name = 'test' if flag == 'test' else 'trainval'
-        self.root_path = f"{root_path}\VOC{name}_06-Nov-2007\VOCdevkit\VOC{year}"
+        self.root_path = f"{root_path}/VOC{name}_06-Nov-2007/VOCdevkit/VOC{year}"
         self.annotation_path = f"{self.root_path}/Annotations"
         self.image_path = f"{self.root_path}/JPEGImages"
         self.flag = flag
@@ -122,21 +122,27 @@ def data_factory(args, flag):
         batch_size = 1
         shuffle = False
         drop_last = False
-    transform = t.Compose([t.ToTensor(), t.RandomHorizontalFlip(prob=0.), t.Resize((448, 448))])
-    data_set = Data(**vars(args), transform=transform)
+
+    if flag == 'train':
+        transform = t.Compose([t.ToTensor(),
+                               t.Resize((args.size[0], args.size[1])),
+                               t.RandomHorizontalFlip(prob=0.),
+                               t.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])])
+    else:
+        transform = t.Compose([t.ToTensor(),
+                               t.Resize((args.size[0], args.size[1])),
+                               t.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])])
+    data_set = Data(**vars(args), transform=transform, flag=flag)
     data_loader = DataLoader(data_set, batch_size=batch_size, shuffle=shuffle, drop_last=drop_last, num_workers=args.num_workers)
     return data_set, data_loader
 
 
 if __name__ == '__main__':
     transform = t.Compose([t.ToTensor(), t.RandomHorizontalFlip(prob=0.), t.Resize((224, 224))])
-    dataset = VOCDataset(transform=transform, flag='val')
-    test_set = VOCDataset(transform=transform, flag='test')
-    index = 0
-    img, target = dataset[index]
-    loader = DataLoader(dataset, batch_size=3)
-    for i, (data, target) in enumerate(loader):
-        break
+    # dataset = VOCDataset(transform=transform, flag='val')
+    # test_set = VOCDataset(transform=transform, flag='test')
+    # index = 0
+    # img, target = dataset[index]
     # fig = plt.figure()
     # ax = fig.add_subplot(1, 1, 1)
     # for box in target['boxes']:
