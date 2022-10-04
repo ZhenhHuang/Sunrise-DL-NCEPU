@@ -71,18 +71,18 @@ class DarkNet(nn.Module):
 
 
 class YOLO_V1(nn.Module):
-    def __init__(self, backbone, grids, boxes, num_classes, dropout=0.):
+    def __init__(self, backbone: str, S, B, num_classes, dropout=0.5):
         super(YOLO_V1, self).__init__()
-        self.backbone = backbone
-        self.grids = grids
-        self.boxes = boxes
+        self.backbone = self._choose_backbone(backbone)
+        self.grids = S
+        self.boxes = B
         self.num_classes = num_classes
         self.fc = nn.Sequential(
             nn.Flatten(),
             nn.Linear(self.backbone.in_features, 4096),
             nn.Dropout(dropout),
             nn.LeakyReLU(0.1),
-            nn.Linear(4096, grids**2 * (5 * boxes + num_classes))
+            nn.Linear(4096, S**2 * (5 * B + num_classes))
         )
 
     def forward(self, x):
@@ -90,9 +90,14 @@ class YOLO_V1(nn.Module):
         x = self.fc(x)
         return x.reshape(-1, self.grids, self.grids, 5 * self.boxes + self.num_classes)
 
+    def _choose_backbone(self, backbone: str):
+        if backbone == 'darknet':
+            return DarkNet()
+
+
 
 if __name__ == '__main__':
-    model = YOLO_V1(DarkNet(), 7, 2, 20)
+    model = YOLO_V1('darknet', 7, 2, 20)
     x = torch.randn(1, 3, 448, 448)
     out = model(x)
     print(out.shape)

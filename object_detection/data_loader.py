@@ -1,19 +1,19 @@
 from torch.utils.data import DataLoader, Dataset
 import torch
 from xml.etree.ElementTree import parse as ET_parse
-import numpy as np
 from PIL import Image
 import os
 from xml.etree.ElementTree import Element
 import matplotlib.pyplot as plt
 import json
 from utils import target_encode, target_decode
+import transforms as t
 
 
 class VOCDataset(Dataset):
     def __init__(self, root_path=r"C:\Users\98311\Downloads",
                  year=2007, flag="train", transform=None, json_file='../datasets/PascalVOC2007/pascal_classes_2007.json',
-                 S=7, B=2):
+                 S=7, B=2, **kwargs):
         super(VOCDataset, self).__init__()
         assert flag in ['train', 'val', 'test']
         name = 'test' if flag == 'test' else 'trainval'
@@ -68,7 +68,7 @@ class VOCDataset(Dataset):
         if self.transform is not None:
             img, target = self.transform(img, target)
         _, H, W = img.shape
-        # target = target_encode(target, self.S, self.B, len(self.map_dict), H, W)
+        target = target_encode(target, self.S, self.B, len(self.map_dict), H, W)
 
         return img, target
 
@@ -103,24 +103,48 @@ class VOCDataset(Dataset):
         return {xml.tag: xml_dict}
 
 
+def data_factory(args, flag):
+    data_dict = {
+        'VOC': VOCDataset
+    }
+    Data = data_dict[args.data]
+    if flag == 'train':
+        batch_size = args.batch_size
+        shuffle = True
+        drop_last = True
+
+    elif flag == 'val':
+        batch_size = args.batch_size
+        shuffle = True
+        drop_last = True
+
+    else:
+        batch_size = 1
+        shuffle = False
+        drop_last = False
+    transform = t.Compose([t.ToTensor(), t.RandomHorizontalFlip(prob=0.), t.Resize((448, 448))])
+    data_set = Data(**vars(args), transform=transform)
+    data_loader = DataLoader(data_set, batch_size=batch_size, shuffle=shuffle, drop_last=drop_last, num_workers=args.num_workers)
+    return data_set, data_loader
+
+
 if __name__ == '__main__':
-    import transforms as t
     transform = t.Compose([t.ToTensor(), t.RandomHorizontalFlip(prob=0.), t.Resize((224, 224))])
     dataset = VOCDataset(transform=transform, flag='val')
-    # test_set = VOCDataset(transform=transform, flag='test')
+    test_set = VOCDataset(transform=transform, flag='test')
     index = 0
     img, target = dataset[index]
     loader = DataLoader(dataset, batch_size=3)
-    # for i, (data, target) in enumerate(loader):
-    #     break
-    fig = plt.figure()
-    ax = fig.add_subplot(1, 1, 1)
-    for box in target['boxes']:
-        xmin, ymin, xmax, ymax = box
-        rect = plt.Rectangle((xmin, ymin), xmax - xmin, ymax - ymin, fill=False, edgecolor='r')
-        ax.add_patch(rect)
-    plt.imshow(img.permute(1, 2, 0))
-    plt.show()
+    for i, (data, target) in enumerate(loader):
+        break
+    # fig = plt.figure()
+    # ax = fig.add_subplot(1, 1, 1)
+    # for box in target['boxes']:
+    #     xmin, ymin, xmax, ymax = box
+    #     rect = plt.Rectangle((xmin, ymin), xmax - xmin, ymax - ymin, fill=False, edgecolor='r')
+    #     ax.add_patch(rect)
+    # plt.imshow(img.permute(1, 2, 0))
+    # plt.show()
 
 
 

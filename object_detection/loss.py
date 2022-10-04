@@ -5,7 +5,7 @@ from object_detection.utils import calc_IoU
 
 
 class YOLOLoss(nn.Module):
-    def __init__(self, S=7, B=2, num_classes=20, w_coord=5, w_noobj=0.5):
+    def __init__(self, S=7, B=2, num_classes=20, w_coord=5, w_noobj=0.5, **kwargs):
         super(YOLOLoss, self).__init__()
         self.S = S
         self.B = B
