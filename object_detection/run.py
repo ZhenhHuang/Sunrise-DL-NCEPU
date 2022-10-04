@@ -46,7 +46,7 @@ parser.add_argument('--loss', type=str, default='yolo', help='Loss type: [yolo, 
 parser.add_argument('--momentum', type=float, default=0.9)
 parser.add_argument('--weight_decay', type=float, default=0.0005)
 parser.add_argument('--lradj', type=str, default='type1', help='type of learning rate adjustment')
-parser.add_argument('--lr', type=float, default=1e-3, help='learning rate')
+parser.add_argument('--lr', type=float, default=1e-4, help='learning rate')
 
 # GPU
 parser.add_argument('--use_gpu', action='store_false', help='use gpu')
