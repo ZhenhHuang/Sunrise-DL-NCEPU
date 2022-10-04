@@ -24,7 +24,8 @@ parser.add_argument('--B', type=int, default=2, help='boxes number for each grid
 # dataloader
 parser.add_argument('--batch_size', type=int, default=16, help='batch size of dataloader')
 parser.add_argument('--num_workers', type=int, default=0, help='how many subprocesses to use for data loading')
-parser.add_argument('--size', type=list, default=[112, 112])
+parser.add_argument('--size', type=list, default=[448, 448])
+parser.add_argument('--threshold', type=float, default=0.05)
 
 # model
 parser.add_argument('--dropout', type=float, default=0.5, help='dropout after the first connected layer')
@@ -61,20 +62,21 @@ args = parser.parse_args()
 if __name__ == '__main__':
     from exp import train, valid
     from data_loader import data_factory
-    from models.yolo_v1 import YOLO_V1
+    from models.yolo_v1 import YOLO_V1, Reshape
+    from detect import detect
     from loss import YOLOLoss
+    from torchvision.models import resnet50
     print(args)
     device = torch.device('cuda:0') if torch.cuda.is_available() and args.use_gpu else torch.device('cpu')
     print(device)
     print(f'backbone: {args.backbone}')
-    model = YOLO_V1(args.backbone, 7, 2, 20).to(device)
+    # model = YOLO_V1(args.backbone, 7, 2, 20).to(device)
+    model = resnet50(pretrained=True).to(device)
+    in_features = model.fc.in_features
+    model.fc = torch.nn.Sequential(torch.nn.Linear(in_features, 1470),
+                                   torch.nn.Sigmoid(), Reshape([-1, 7, 7, 30])).to(device)
     # train(args, model, device)
-    # torch.cuda.empty_cache()
-    # print("----------loading train set-------")
-    # train_set, train_loader = data_factory(args, flag='train')
-    print("----------loading valid set-------")
-    valid_set, valid_loader = data_factory(args, flag='val')
-    print("----------loading test set--------")
-    test_set, test_loader = data_factory(args, flag='test')
-    loss = valid(valid_loader, model, YOLOLoss(), device)
-    loss2 = valid(test_loader, model, YOLOLoss(), device)
+    detect(args, model, device)
+
+    torch.cuda.empty_cache()
+

@@ -39,7 +39,8 @@ def target_decode(target_tensor: torch.Tensor, threshold, S, B):
     :param B: 2
     """
     class_score, class_label = torch.max(target_tensor[:, :, 5 * B:], dim=-1)   # [S, S]
-    confidence = target_tensor[:, :, [4 + b * 5 for b in range(B)]] * class_score.unsqueeze(-1)     # [S, S, 2]
+    # confidence = target_tensor[:, :, [4 + b * 5 for b in range(B)]] * class_score.unsqueeze(-1)     # [S, S, 2]
+    confidence = target_tensor[:, :, [4 + b * 5 for b in range(B)]]     # [S, S, 2]
     i, j, b = torch.where(confidence >= threshold)   # i: y, j: x, b: box
     confidence = confidence[i, j, b]
     class_label = class_label[i, j]

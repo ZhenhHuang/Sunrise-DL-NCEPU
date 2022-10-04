@@ -57,8 +57,6 @@ class DarkNet(nn.Module):
             nn.Conv2d(1024, 1024, 3, 1, 1),
             nn.Conv2d(1024, 1024, 3, 1, 1)
         )
-        self.avgpool = nn.AdaptiveAvgPool2d((7, 7))
-        self.in_features = 7 * 7 * 1024
 
     def forward(self, x):
         x = self.block1(x)
@@ -67,7 +65,6 @@ class DarkNet(nn.Module):
         x = self.block4(x)
         x = self.block5(x)
         x = self.block6(x)
-        x = self.avgpool(x)
         return x
 
 
@@ -78,9 +75,10 @@ class YOLO_V1(nn.Module):
         self.grids = S
         self.boxes = B
         self.num_classes = num_classes
+        self.avgpool = nn.AdaptiveAvgPool2d((S, S))
         self.fc = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(self.backbone.in_features, 4096),
+            nn.Linear(S * S * 1024, 4096),
             nn.Dropout(dropout),
             nn.LeakyReLU(0.1),
             nn.Linear(4096, S**2 * (5 * B + num_classes)),
@@ -89,12 +87,22 @@ class YOLO_V1(nn.Module):
 
     def forward(self, x):
         x = self.backbone(x)
+        x = self.avgpool(x)
         x = self.fc(x)
         return x.reshape(-1, self.grids, self.grids, 5 * self.boxes + self.num_classes)
 
     def _choose_backbone(self, backbone: str):
         if backbone == 'darknet':
             return DarkNet()
+
+
+class Reshape(nn.Module):
+    def __init__(self, shape):
+        super().__init__()
+        self.shape = shape
+
+    def forward(self, x):
+        return x.reshape(self.shape)
 
 
 if __name__ == '__main__':

@@ -2,6 +2,7 @@ import torch
 import numpy as np
 import torch.optim as optim
 from loss import YOLOLoss
+import matplotlib.pyplot as plt
 
 
 def choose_optim(model, args):
@@ -71,3 +72,16 @@ def adjust_learning_rate(optimizer, epoch, args):
         print('Updating learning rate to {}'.format(lr))
         return 1
     return 0
+
+
+def visualize(img, boxes, classes, probs, k):
+    fig = plt.figure()
+    ax = fig.add_subplot(1, 1, 1)
+    for i in range(len(boxes)):
+        xmin, ymin, xmax, ymax = boxes[i]
+        rect = plt.Rectangle((xmin, ymin), xmax - xmin, ymax - ymin, fill=False, label=f"{classes[i]}:{probs[i]}")
+        ax.add_patch(rect)
+    plt.legend()
+    plt.imshow(img.permute(1, 2, 0))
+    plt.savefig(f"./results/{k}.pdf")
+    # plt.show()
