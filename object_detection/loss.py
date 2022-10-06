@@ -34,12 +34,12 @@ class YOLOLoss(nn.Module):
         response_mask = torch.zeros(box_pred.shape[0], dtype=bool).to(pred_obj.device)
         target_iou = torch.zeros(box_true.shape[0]).to(true_obj.device)
         for i in range(0, true_obj.shape[0], self.B):
-            pred = pred_obj[i: i + self.B]  # [B, 5]
+            pred = box_pred[i: i + self.B]  # [B, 5]
             pred_corner = torch.zeros(pred.shape[0], 4).to(pred_obj.device)     # [B, 4]
             pred_corner[:, :2] = pred[:, :2] - 0.5 * pred[:, 2:4]
             pred_corner[:, 2:] = pred[:, :2] + 0.5 * pred[:, 2:4]
 
-            true = true_obj[i].unsqueeze(0)  # [1, 5]
+            true = box_true[i].unsqueeze(0)  # [1, 5]
             true_corner = torch.zeros(true.shape[0], 4).to(true_obj.device)  # [1, 4]
             true_corner[:, :2] = true[:, :2] - 0.5 * true[:, 2:4]
             true_corner[:, 2:] = true[:, :2] + 0.5 * true[:, 2:4]

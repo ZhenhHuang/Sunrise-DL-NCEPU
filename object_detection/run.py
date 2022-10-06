@@ -16,7 +16,7 @@ parser = argparse.ArgumentParser(description="object detection")
 parser.add_argument('--data', type=str, default='VOC', help='name of dataset')
 parser.add_argument('--root_path', type=str, default="C:/Users/98311/Downloads", help='root path of dataset')
 parser.add_argument('--year', type=int, default=2007, help='year of VOC dataset')
-parser.add_argument('--json_file', type=str, default='../datasets/PascalVOC2007/pascal_classes_2007.json',
+parser.add_argument('--json_file', type=str, default='./data/pascal_classes_2007.json',
                     help="json file of class mapping")
 parser.add_argument('--S', type=int, default=7, help='grids of image to split')
 parser.add_argument('--B', type=int, default=2, help='boxes number for each grid')
@@ -61,22 +61,16 @@ args = parser.parse_args()
 
 if __name__ == '__main__':
     from exp import train, valid
-    from data_loader import data_factory
-    from models.yolo_v1 import YOLO_V1, Reshape
+    from models.yolo_v1 import YOLO_V1
     from detect import detect
-    from loss import YOLOLoss
     from torchvision.models import resnet50, vgg11
     print(args)
     device = torch.device('cuda:0') if torch.cuda.is_available() and args.use_gpu else torch.device('cpu')
     print(device)
     print(f'backbone: {args.backbone}')
-    # model = YOLO_V1(args.backbone, 7, 2, 20).to(device)
-    model = vgg11(weights=True).to(device)
-    in_features = 25088
-    model.classifier = torch.nn.Sequential(torch.nn.Linear(in_features, 1470),
-                                           torch.nn.Sigmoid(), Reshape([-1, 7, 7, 30])).to(device)
-    # train(args, model, device)
-    detect(args, model, device)
+    model = YOLO_V1(args.backbone, 7, 2, 20).to(device)
+    train(args, model, device)
+    # detect(args, model, device)
 
     torch.cuda.empty_cache()
 

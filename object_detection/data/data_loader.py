@@ -4,15 +4,13 @@ from xml.etree.ElementTree import parse as ET_parse
 from PIL import Image
 import os
 from xml.etree.ElementTree import Element
-import matplotlib.pyplot as plt
 import json
-from utils import target_encode, target_decode
-import transforms as t
+from object_detection.utils import target_encode, target_decode
 
 
 class VOCDataset(Dataset):
     def __init__(self, root_path="C:/Users/98311/Downloads",
-                 year=2007, flag="train", transform=None, json_file='../datasets/PascalVOC2007/pascal_classes_2007.json',
+                 year=2007, flag="train", transform=None, json_file='./pascal_classes_2007.json',
                  S=7, B=2, **kwargs):
         super(VOCDataset, self).__init__()
         assert flag in ['train', 'val', 'test']
@@ -103,46 +101,13 @@ class VOCDataset(Dataset):
         return {xml.tag: xml_dict}
 
 
-def data_factory(args, flag):
-    data_dict = {
-        'VOC': VOCDataset
-    }
-    Data = data_dict[args.data]
-    if flag == 'train':
-        batch_size = args.batch_size
-        shuffle = True
-        drop_last = True
-
-    elif flag == 'val':
-        batch_size = args.batch_size
-        shuffle = True
-        drop_last = True
-
-    else:
-        batch_size = 1
-        shuffle = False
-        drop_last = False
-
-    if flag == 'train':
-        transform = t.Compose([t.ToTensor(),
-                               t.Resize((args.size[0], args.size[1])),
-                               t.RandomHorizontalFlip(prob=0.),
-                               t.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])])
-    else:
-        transform = t.Compose([t.ToTensor(),
-                               t.Resize((args.size[0], args.size[1])),
-                               t.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])])
-    data_set = Data(**vars(args), transform=transform, flag=flag)
-    data_loader = DataLoader(data_set, batch_size=batch_size, shuffle=shuffle, drop_last=drop_last, num_workers=args.num_workers)
-    return data_set, data_loader
-
-
 if __name__ == '__main__':
-    transform = t.Compose([t.ToTensor(), t.RandomHorizontalFlip(prob=0.), t.Resize((224, 224))])
-    # dataset = VOCDataset(transform=transform, flag='val')
-    # test_set = VOCDataset(transform=transform, flag='test')
-    # index = 0
-    # img, target = dataset[index]
+    import matplotlib.pyplot as plt
+    import transforms as t
+    transform = t.Compose([t.ToTensor(), t.Resize((224, 224))])
+    dataset = VOCDataset(transform=transform, flag='train')
+    _, target = dataset[1]
+    print(target_decode(target, 0.9, 7, 2, 224, 224))
     # fig = plt.figure()
     # ax = fig.add_subplot(1, 1, 1)
     # for box in target['boxes']:

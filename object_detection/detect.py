@@ -1,6 +1,7 @@
 import torch
 from utils import target_decode
-from data_loader import data_factory, VOCDataset
+from object_detection.data.data_factory import data_factory
+from object_detection.data.data_loader import VOCDataset
 from tools import visualize
 from torchvision.transforms import Normalize
 
