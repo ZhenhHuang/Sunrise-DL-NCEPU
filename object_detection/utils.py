@@ -46,7 +46,7 @@ def target_decode(target_tensor: torch.Tensor, threshold, S, B, H, W):
     confidence = target_tensor[:, :, [4 + b * 5 for b in range(B)]]     # [S, S, 2]
 
     prob = confidence * class_score.unsqueeze(-1)  # [S, S, 2]
-    i, j, b = torch.where(prob >= threshold)   # i: y, j: x, b: box
+    i, j, b = torch.where(prob > threshold)   # i: y, j: x, b: box
 
     confidence = confidence[i, j, b]
     class_label = class_label[i, j]
@@ -57,8 +57,8 @@ def target_decode(target_tensor: torch.Tensor, threshold, S, B, H, W):
     center = (cells + boxes[:, :2]) / S
     width_height = boxes[:, 2:]
     box_corner = torch.zeros_like(boxes).to(target_tensor.device)   # x1, y1, x2, y2
-    box_corner[:, :2] = (center - width_height / 2) * torch.tensor([W, H])
-    box_corner[:, 2:] = (center + width_height / 2) * torch.tensor([W, H])
+    box_corner[:, :2] = (center - width_height / 2) * torch.tensor([W, H]).to(center.device)
+    box_corner[:, 2:] = (center + width_height / 2) * torch.tensor([W, H]).to(center.device)
 
     return box_corner, class_label, confidence, class_score
 

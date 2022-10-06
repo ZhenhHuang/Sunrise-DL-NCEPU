@@ -54,6 +54,7 @@ class YOLOLoss(nn.Module):
         loss_xy = F.mse_loss(box_pred_response[:, :2], box_true_response[:, :2], reduction='sum')
         loss_wh = F.mse_loss(box_pred_response[:, 2:4].sqrt(), box_true_response[:, 2:4].sqrt(), reduction='sum')
         loss_obj = F.mse_loss(box_pred_response[:, 4], target_iou[response_mask], reduction='sum')
+        # loss_obj = F.mse_loss(box_pred_response[:, 4], box_true_response[:, 4], reduction='sum')
         loss_class = F.mse_loss(cls_pred, cls_true, reduction='sum')
 
         loss = self.w_coord * (loss_xy + loss_wh) + loss_obj + self.w_noobj * loss_noobj + loss_class

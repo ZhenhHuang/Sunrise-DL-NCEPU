@@ -79,3 +79,8 @@ def choose_backbone(backbone: str):
         model = nn.Sequential(*list(resnet50.children())[:-2])
         model.out_channel = resnet50.fc.in_features
         return model
+    elif backbone == 'vgg11':
+        vgg11 = models.vgg11(pretrained=True)
+        model = nn.Sequential(*list(vgg11.children())[:-2])
+        model.out_channel = 512
+        return model

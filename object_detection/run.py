@@ -24,15 +24,15 @@ parser.add_argument('--B', type=int, default=2, help='boxes number for each grid
 # dataloader
 parser.add_argument('--batch_size', type=int, default=16, help='batch size of dataloader')
 parser.add_argument('--num_workers', type=int, default=0, help='how many subprocesses to use for data loading')
-parser.add_argument('--size', type=list, default=[448, 448])
-parser.add_argument('--threshold', type=float, default=0.5)
+parser.add_argument('--size', type=list, default=[448, 448], help='[width, height]')
+parser.add_argument('--threshold', type=float, default=0.01)
 
 # model
 parser.add_argument('--dropout', type=float, default=0.5, help='dropout after the first connected layer')
 parser.add_argument('--num_classes', type=int, default=20)
 parser.add_argument('--w_coord', type=float, default=5.)
 parser.add_argument('--w_noobj', type=float, default=.5)
-parser.add_argument('--backbone', type=str, default='darknet', help='backbone of model: [darknet, resnet50]')
+parser.add_argument('--backbone', type=str, default='vgg11', help='backbone of model: [darknet, resnet50, vgg11]')
 
 # train
 parser.add_argument('--epochs', type=int, default=135, help='train epochs')
@@ -54,23 +54,22 @@ parser.add_argument('--gpu', type=int, default=0, help='gpu')
 parser.add_argument('--devices', type=str, default='0,1', help='device ids of multile gpus')
 
 # save information
-parser.add_argument('--model_path', type=str, default='model.pt', help='path for saving model')
+parser.add_argument('--model_path', type=str, default='vgg11.pt', help='path for saving model')
 
 
 args = parser.parse_args()
 
 if __name__ == '__main__':
-    from exp import train, valid
+    from exp import train
     from models.yolo_v1 import YOLO_V1
     from detect import detect
-    from torchvision.models import resnet50, vgg11
     print(args)
     device = torch.device('cuda:0') if torch.cuda.is_available() and args.use_gpu else torch.device('cpu')
     print(device)
     print(f'backbone: {args.backbone}')
     model = YOLO_V1(args.backbone, 7, 2, 20).to(device)
-    train(args, model, device)
-    # detect(args, model, device)
+    # train(args, model, device)
+    detect(args, model, device)
 
     torch.cuda.empty_cache()
 

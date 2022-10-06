@@ -79,9 +79,12 @@ def visualize(img, boxes, classes, probs, k):
     ax = fig.add_subplot(1, 1, 1)
     for i in range(len(boxes)):
         xmin, ymin, xmax, ymax = boxes[i]
-        rect = plt.Rectangle((xmin, ymin), xmax - xmin, ymax - ymin, fill=False, label=f"{classes[i]}:{probs[i]}")
+        rect = plt.Rectangle((xmin, ymin), xmax - xmin, ymax - ymin, fill=False, edgecolor='red',
+                             label=f"{classes[i]}:{probs[i]}")
+        ax.text(xmin, ymin - 5, f"{classes[i]}:{probs[i]}", fontsize=5, color='red',
+                bbox=dict(boxstyle='round,pad=0.5', fc='yellow', ec='blue', lw=2, alpha=0.7))
         ax.add_patch(rect)
-    plt.legend()
+    # plt.legend()
     plt.imshow(img.permute(1, 2, 0))
     plt.savefig(f"./results/{k}.pdf")
     # plt.show()

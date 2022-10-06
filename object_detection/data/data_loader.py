@@ -11,7 +11,7 @@ from object_detection.utils import target_encode, target_decode
 class VOCDataset(Dataset):
     def __init__(self, root_path="C:/Users/98311/Downloads",
                  year=2007, flag="train", transform=None, json_file='./pascal_classes_2007.json',
-                 S=7, B=2, **kwargs):
+                 S=7, B=2, return_size=False, **kwargs):
         super(VOCDataset, self).__init__()
         assert flag in ['train', 'val', 'test']
         name = 'test' if flag == 'test' else 'trainval'
@@ -27,6 +27,7 @@ class VOCDataset(Dataset):
         self.transform = transform
         self.S = S
         self.B = B
+        self.return_size = return_size
 
     def __len__(self):
         return len(self.xml_list)
@@ -37,6 +38,8 @@ class VOCDataset(Dataset):
         boxes = []
         labels = []
         iscrowd = []
+        size = list(label['annotation']['size'].values())[:-1]    # width height
+        size = list(map(int, size))
         for obj in label['annotation']['object']:
             xmin = float(obj["bndbox"]["xmin"])
             xmax = float(obj["bndbox"]["xmax"])
@@ -67,7 +70,8 @@ class VOCDataset(Dataset):
             img, target = self.transform(img, target)
         _, H, W = img.shape
         target = target_encode(target, self.S, self.B, len(self.map_dict), H, W)
-
+        if self.return_size:
+            return img, target, torch.tensor(size)
         return img, target
 
     def _get_xml_list(self):
