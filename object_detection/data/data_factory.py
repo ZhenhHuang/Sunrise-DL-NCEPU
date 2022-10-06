@@ -13,7 +13,7 @@ def data_factory(args, flag):
         shuffle = True
         drop_last = True
 
-    elif flag == 'val':
+    elif flag == 'val' or flag == 'test':
         batch_size = args.batch_size
         shuffle = True
         drop_last = True

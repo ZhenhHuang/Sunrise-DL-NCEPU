@@ -16,7 +16,7 @@ def calc_IoU(bbox1: torch.Tensor, bbox2: torch.Tensor):
     area1 = ((bbox1[:, 2] - bbox1[:, 0]) * (bbox1[:, 3] - bbox1[:, 1])).unsqueeze(1)
     area2 = ((bbox2[:, 2] - bbox2[:, 0]) * (bbox2[:, 3] - bbox2[:, 1])).unsqueeze(0)
     intersection = (right - left) * (bottom - top)
-    return intersection / (area1 + area2 - intersection)
+    return intersection / (area1 + area2 - intersection + 1e-6)
 
 
 def target_encode(target, S, B, num_classes, H, W):

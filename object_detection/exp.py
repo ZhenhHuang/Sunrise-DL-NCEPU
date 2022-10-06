@@ -35,6 +35,7 @@ def train(args, model, device):
             train_losses.append(loss.item())
             optimizer.zero_grad()
             loss.backward()
+            nn.utils.clip_grad_norm_(model.parameters(), max_norm=20, norm_type=2)
             optimizer.step()
             if i % args.verbose == 0:
                 print(f"iter {i}, loss: {loss.item()}")

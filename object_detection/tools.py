@@ -59,7 +59,7 @@ class EarlyStopping:
 def adjust_learning_rate(optimizer, epoch, args):
     if args.lradj == 'type1':
         lr_adjust = {
-            0: 1e-2, 75: 1e-3, 105: 1e-4
+            0: 1e-3, 75: 1e-4, 105: 1e-5
         }
     elif args.lradj == 'type2':
         lr_adjust = {epoch: args.learning_rate * (0.5 ** (epoch // 2))}
