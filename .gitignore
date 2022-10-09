@@ -15,4 +15,6 @@ __pycache__/
 /datasets/*.zip
 /datasets/caltech101/*.zip
 /datasets/PascalVOC2007/*
+/results/*
+/object_detection/results/*
 *.pt
