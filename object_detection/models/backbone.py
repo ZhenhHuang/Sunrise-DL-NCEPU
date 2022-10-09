@@ -60,7 +60,13 @@ class DarkNet(nn.Module):
             ConvBlock(1024, 512, 1, 1, 0),
             ConvBlock(512, 1024, 3, 1, 1),
         )
-        self.out_channel = 1024
+        self.block6 = nn.Sequential(
+            ConvBlock(1024, 1024, 3, 1, 1),
+            ConvBlock(1024, 1024, 3, 2, 1),
+            ConvBlock(1024, 1024, 3, 1, 1),
+            ConvBlock(1024, 1024, 3, 1, 1)
+        )
+        self.out_feature = 7 * 7 * 1024
 
     def forward(self, x):
         x = self.block1(x)
@@ -76,11 +82,21 @@ def choose_backbone(backbone: str):
         return DarkNet()
     elif backbone == 'resnet50':
         resnet50 = models.resnet50(pretrained=True)
-        model = nn.Sequential(*list(resnet50.children())[:-2])
-        model.out_channel = resnet50.fc.in_features
+        model = nn.Sequential(*list(resnet50.children())[:-1])
+        model.out_features = resnet50.fc.in_features
         return model
     elif backbone == 'vgg11':
         vgg11 = models.vgg11(pretrained=True)
-        model = nn.Sequential(*list(vgg11.children())[:-2])
-        model.out_channel = 512
+        model = nn.Sequential(*list(vgg11.children())[:-1])
+        model.out_features = 512 * 7 * 7
+        return model
+    elif backbone == 'vgg16':
+        vgg16 = models.vgg16(pretrained=False)
+        model = nn.Sequential(*list(vgg16.children())[:-1])
+        model.out_features = 512 * 7 * 7
+        return model
+    elif backbone == 'vgg16_bn':
+        vgg16 = models.vgg16_bn(pretrained=False)
+        model = nn.Sequential(*list(vgg16.children())[:-1])
+        model.out_features = 512 * 7 * 7
         return model

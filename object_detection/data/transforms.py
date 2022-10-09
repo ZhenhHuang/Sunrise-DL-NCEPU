@@ -69,3 +69,4 @@ class Compose:
         for t in self.transfoms:
             image, target = t(image, target)
         return image, target
+
