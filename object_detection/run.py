@@ -32,7 +32,7 @@ parser.add_argument('--dropout', type=float, default=0.5, help='dropout after th
 parser.add_argument('--num_classes', type=int, default=20)
 parser.add_argument('--w_coord', type=float, default=5.)
 parser.add_argument('--w_noobj', type=float, default=.5)
-parser.add_argument('--backbone', type=str, default='vgg16', help='backbone of model: [darknet, resnet50, vgg11, vgg16, vgg16_bn]')
+parser.add_argument('--backbone', type=str, default='resnet50', help='backbone of model: [darknet, resnet50, vgg11, vgg16, vgg16_bn]')
 
 # train
 parser.add_argument('--epochs', type=int, default=135, help='train epochs')
@@ -54,7 +54,8 @@ parser.add_argument('--gpu', type=int, default=0, help='gpu')
 parser.add_argument('--devices', type=str, default='0,1', help='device ids of multile gpus')
 
 # save information
-parser.add_argument('--model_path', type=str, default='vgg16.pt', help='path for saving model')
+parser.add_argument('--model_path', type=str, default='res50.pt', help='path for saving model')
+parser.add_argument('--result_path', type=str, default='results', help='path for saving results')
 
 args = parser.parse_args()
 
@@ -63,6 +64,7 @@ if __name__ == '__main__':
     from exp import train
     from models.yolo_v1 import YOLO_V1
     from detect import detect
+    from eval_metrics.voc_eval import VOCMetric
     print(args)
     device = torch.device('cuda:0') if torch.cuda.is_available() and args.use_gpu else torch.device('cpu')
     print(device)
@@ -70,6 +72,7 @@ if __name__ == '__main__':
     model = YOLO_V1(args.backbone, 7, 2, 20).to(device)
     # train(args, model, device)
     detect(args, model, device)
-
+    eval = VOCMetric()
+    map = eval.evaluate()
     torch.cuda.empty_cache()
 

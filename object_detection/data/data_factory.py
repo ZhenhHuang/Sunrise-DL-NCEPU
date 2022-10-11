@@ -37,7 +37,7 @@ def data_factory(args, flag):
         batch_size = 1
         shuffle = False
         drop_last = False
-        flag = 'train'
+        flag = 'test'
         return_size = True
 
     data_set = Data(**vars(args), transform=transform, flag=flag, return_size=return_size)

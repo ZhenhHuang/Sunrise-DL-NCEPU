@@ -32,14 +32,11 @@ class VOCDataset(Dataset):
     def __len__(self):
         return len(self.xml_list)
 
-    def __getitem__(self, index):
-        img = Image.open(self.image_list[index]).convert("RGB")
+    def getTarget(self, index):
         label = self.get_xml_dict(ET_parse(self.xml_list[index]).getroot())
         boxes = []
         labels = []
         iscrowd = []
-        size = list(label['annotation']['size'].values())[:-1]    # width height
-        size = list(map(int, size))
         for obj in label['annotation']['object']:
             xmin = float(obj["bndbox"]["xmin"])
             xmax = float(obj["bndbox"]["xmax"])
@@ -65,7 +62,13 @@ class VOCDataset(Dataset):
         target["image_id"] = image_id
         target["area"] = area
         target["iscrowd"] = iscrowd
+        return target, label
 
+    def __getitem__(self, index):
+        img = Image.open(self.image_list[index]).convert("RGB")
+        target, label = self.getTarget(index)
+        size = list(label['annotation']['size'].values())[:-1]    # width height
+        size = list(map(int, size))
         if self.transform is not None:
             img, target = self.transform(img, target)
         _, H, W = img.shape
