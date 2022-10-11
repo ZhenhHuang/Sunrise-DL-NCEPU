@@ -2,6 +2,7 @@ import torch
 import torchvision.transforms as transforms
 from torch.utils.data import Dataset, DataLoader
 from torchvision.transforms import InterpolationMode
+import numpy as np
 import os
 import zipfile
 from PIL import Image
