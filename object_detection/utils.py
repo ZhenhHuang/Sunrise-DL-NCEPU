@@ -1,6 +1,4 @@
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
 
 
 def calc_IoU(bbox1: torch.Tensor, bbox2: torch.Tensor):
@@ -80,20 +78,40 @@ def NonMaximalSuppression(boxes, classes, confidence, scores, threshold):
     for cls in class_unique:
         idx = (classes == cls)
         boxes_masked = boxes[idx]
-        scores_masked = scores[idx]
-        confidence_masked = confidence[idx]
+        prob_masked = scores[idx] * confidence[idx]
 
-        _, max_idx = torch.max(confidence_masked * scores_masked, dim=0)
-        iou = calc_IoU(boxes_masked, boxes_masked[max_idx])
-        maintain_mask = (iou <= threshold).reshape(-1)
-        maintain_mask[max_idx] = True
+        order_idx = torch.argsort(prob_masked, descending=True)
+        boxes_masked = boxes_masked[order_idx]
+        prob_masked = prob_masked[order_idx]    # ordered descending
 
-        return_boxes.append(boxes_masked[maintain_mask])
-        return_classes.append(torch.tensor([cls] * maintain_mask.sum().item()))
-        return_probs.append((scores_masked * confidence_masked)[maintain_mask])
+        maintain_boxes = []
+        maintain_probs = []
+        while True:
+            if len(boxes_masked) == 0:
+                break
+            max_box = boxes_masked[0]
+            max_prob = prob_masked[0]
+            maintain_boxes.append(max_box.reshape(1, -1))
+            maintain_probs.append(max_prob.reshape(-1))
+            boxes_masked = boxes_masked[1:]
+            prob_masked = prob_masked[1:]
+            iou = calc_IoU(max_box, boxes_masked)
+            maintain_mask = (iou <= threshold).reshape(-1)
+            boxes_masked = boxes_masked[maintain_mask]
+            prob_masked = prob_masked[maintain_mask]
+
+        maintain_boxes = torch.concat(maintain_boxes, dim=0)
+        maintain_probs = torch.concat(maintain_probs, dim=0)
+
+        return_boxes.append(maintain_boxes)
+        return_classes.append(torch.tensor([cls] * len(maintain_probs)))
+        return_probs.append(maintain_probs)
 
     return_boxes = torch.vstack(return_boxes)
     return_classes = torch.concat(return_classes, dim=-1)
     return_probs = torch.concat(return_probs, dim=-1)
 
     return return_boxes, return_classes, return_probs
+
+
+

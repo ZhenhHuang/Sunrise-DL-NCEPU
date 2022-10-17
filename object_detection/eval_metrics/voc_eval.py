@@ -64,7 +64,6 @@ class VOCMetric:
         lines = f.readlines()
         f.close()
         imagenames = [name.strip().split(' ')[0] for name in lines]
-
         # get gt objects
         class_recs = {}
         npos = 0

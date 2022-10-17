@@ -62,14 +62,15 @@ args = parser.parse_args()
 
 if __name__ == '__main__':
     from exp import train
-    from models.yolo_v1 import YOLO_V1
     from detect import detect
+    from models.yolo_v1 import YOLO_V1
     from eval_metrics.voc_eval import VOCMetric
     print(args)
     device = torch.device('cuda:0') if torch.cuda.is_available() and args.use_gpu else torch.device('cpu')
     print(device)
     print(f'backbone: {args.backbone}')
     model = YOLO_V1(args.backbone, 7, 2, 20).to(device)
+    model.load_state_dict(torch.load(f"./checkpoints/{args.model_path}"))
     # train(args, model, device)
     detect(args, model, device)
     eval = VOCMetric()

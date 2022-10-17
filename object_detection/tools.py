@@ -105,7 +105,6 @@ def visualize(img, boxes, classes, probs, k):
         ax.text(xmin, ymin - 5, f"{classes[i]}:{probs[i]}", fontsize=5, color='red',
                 bbox=dict(boxstyle='round,pad=0.5', fc='yellow', ec='blue', lw=2, alpha=0.7))
         ax.add_patch(rect)
-    # plt.legend()
     plt.imshow(img.permute(1, 2, 0))
-    plt.savefig(f"./results/{k}.pdf")
+    plt.savefig(f"./pics/{k}.pdf")
     # plt.show()
