@@ -74,7 +74,7 @@ if __name__ == '__main__':
     print(f'backbone: {args.backbone}')
     model = YOLO_V1(args.backbone, 7, 2, 20).to(device)
     model.load_state_dict(torch.load(f"./checkpoints/{args.model_path}"))
-    # train(args, model, device)
+    train(args, model, device)
     detect(args, model, device)
     eval = VOCMetric()
     map = eval.evaluate()
