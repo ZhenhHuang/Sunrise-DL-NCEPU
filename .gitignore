@@ -18,3 +18,7 @@ __pycache__/
 /results/*
 /object_detection/results/*
 *.pt
+
+./object_detection/results/*
+./object_detection/checkpoints/*
+./object_detection/pics/*
