@@ -15,7 +15,7 @@ parser = argparse.ArgumentParser(description="object detection")
 # dataset
 parser.add_argument('--data', type=str, default='VOC', help='name of dataset')
 parser.add_argument('--root_path', type=str, default="C:/Users/98311/Downloads", help='root path of dataset')
-parser.add_argument('--year', type=int, default=2012, help='year of VOC dataset')
+parser.add_argument('--trainval_year', type=int, default=2012, help='year of VOC dataset')
 parser.add_argument('--json_file', type=str, default='./data/pascal_classes_2007.json',
                     help="json file of class mapping")
 parser.add_argument('--S', type=int, default=7, help='grids of image to split')
