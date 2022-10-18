@@ -6,7 +6,7 @@ import json
 
 
 class VOCMetric:
-    def __init__(self, root_path="C:/Users/98311/Downloads/VOCtest_06-Nov-2007/VOCdevkit", json_file='./data/pascal_classes_2007.json',
+    def __init__(self, root_path="C:\Users\98311\Documents\datasets/VOCdevkit", json_file='./data/pascal_classes_2007.json',
                  detect_path='./results', year=2007, use_2007=True):
         self.use_2007 = use_2007
         self.annotation_path = f"{root_path}/VOC{year}/Annotations"

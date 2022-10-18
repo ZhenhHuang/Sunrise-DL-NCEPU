@@ -22,6 +22,7 @@ def data_factory(args, flag):
         transform = t.Compose([t.ToTensor(), t.Resize((args.size[0], args.size[1]))])   # predict
 
     return_size = False
+    year = args.year
     if flag == 'train':
         batch_size = args.batch_size
         shuffle = True
@@ -39,7 +40,8 @@ def data_factory(args, flag):
         drop_last = False
         flag = 'test'
         return_size = True
+        year = args.test_year
 
-    data_set = Data(**vars(args), transform=transform, flag=flag, return_size=return_size)
+    data_set = Data(**vars(args), transform=transform, flag=flag, return_size=return_size, year=year)
     data_loader = DataLoader(data_set, batch_size=batch_size, shuffle=shuffle, drop_last=drop_last, num_workers=args.num_workers)
     return data_set, data_loader

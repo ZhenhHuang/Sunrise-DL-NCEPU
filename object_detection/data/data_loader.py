@@ -9,13 +9,14 @@ from object_detection.utils import target_encode, target_decode
 
 
 class VOCDataset(Dataset):
-    def __init__(self, root_path="C:/Users/98311/Downloads",
+    def __init__(self, root_path="C:\Users\98311\Documents\datasets",
                  year=2007, flag="train", transform=None, json_file='./pascal_classes_2007.json',
                  S=7, B=2, return_size=False, **kwargs):
         super(VOCDataset, self).__init__()
         assert flag in ['train', 'val', 'test']
+        print(f'Using VOC{year} for {flag}')
         name = 'test' if flag == 'test' else 'trainval'
-        self.root_path = f"{root_path}/VOC{name}_06-Nov-2007/VOCdevkit/VOC{year}"
+        self.root_path = f"{root_path}/VOCdevkit/VOC{year}"
         self.annotation_path = f"{self.root_path}/Annotations"
         self.image_path = f"{self.root_path}/JPEGImages"
         self.flag = flag
@@ -115,14 +116,6 @@ if __name__ == '__main__':
     dataset = VOCDataset(transform=transform, flag='train')
     _, target = dataset[1]
     print(target_decode(target, 0.9, 7, 2, 224, 224))
-    # fig = plt.figure()
-    # ax = fig.add_subplot(1, 1, 1)
-    # for box in target['boxes']:
-    #     xmin, ymin, xmax, ymax = box
-    #     rect = plt.Rectangle((xmin, ymin), xmax - xmin, ymax - ymin, fill=False, edgecolor='r')
-    #     ax.add_patch(rect)
-    # plt.imshow(img.permute(1, 2, 0))
-    # plt.show()
 
 
 

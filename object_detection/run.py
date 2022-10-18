@@ -15,7 +15,7 @@ parser = argparse.ArgumentParser(description="object detection")
 # dataset
 parser.add_argument('--data', type=str, default='VOC', help='name of dataset')
 parser.add_argument('--root_path', type=str, default="C:/Users/98311/Downloads", help='root path of dataset')
-parser.add_argument('--year', type=int, default=2007, help='year of VOC dataset')
+parser.add_argument('--year', type=int, default=2012, help='year of VOC dataset')
 parser.add_argument('--json_file', type=str, default='./data/pascal_classes_2007.json',
                     help="json file of class mapping")
 parser.add_argument('--S', type=int, default=7, help='grids of image to split')
@@ -39,6 +39,9 @@ parser.add_argument('--epochs', type=int, default=135, help='train epochs')
 parser.add_argument('--verbose', type=int, default=20, help='verbose frequency of train steps')
 parser.add_argument('--patience', type=int, default=3, help='patience for early stopping')
 parser.add_argument('--delta', type=float, default=0., help='error of two valid loss')
+
+# detect and eval
+parser.add_argument('--test_year', type=str, default=2007, help='year of VOC dataset for test')
 
 # optimizer
 parser.add_argument('--optim', type=str, default='SGD', help='[SGD, Adam]')
