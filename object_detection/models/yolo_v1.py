@@ -19,6 +19,11 @@ class YOLO_V1(nn.Module):
             nn.Linear(4096, S**2 * (5 * B + num_classes)),
             nn.Sigmoid()
         )
+        # self.fc = nn.Sequential(
+        #     nn.Flatten(),
+        #     nn.Linear(self.backbone.out_features, S ** 2 * (5 * B + num_classes)),
+        #     nn.Sigmoid()
+        # )
 
     def forward(self, x):
         x = self.backbone(x)

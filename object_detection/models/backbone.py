@@ -80,6 +80,11 @@ class DarkNet(nn.Module):
 def choose_backbone(backbone: str):
     if backbone == 'darknet':
         return DarkNet()
+    elif backbone == 'resnet18':
+        resnet18 = models.resnet18(pretrained=True)
+        model = nn.Sequential(*list(resnet18.children())[:-1])
+        model.out_features = resnet18.fc.in_features
+        return model
     elif backbone == 'resnet50':
         resnet50 = models.resnet50(pretrained=True)
         model = nn.Sequential(*list(resnet50.children())[:-1])

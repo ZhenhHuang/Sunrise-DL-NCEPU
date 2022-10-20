@@ -2,6 +2,7 @@ import torch
 import numpy as np
 import torch.optim as optim
 from loss import YOLOLoss
+import json
 import matplotlib.pyplot as plt
 
 
@@ -96,14 +97,20 @@ def visualize(img, boxes, classes, probs, k):
              [0, 192, 0],
              [128, 192, 0],
              [0, 64, 128]]
+    color = np.array(color) / 255.
+    f = open('./data/pascal_classes_2007.json')
+    map_dict = json.load(f)
+    f.close()
+
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
     for i in range(len(boxes)):
         xmin, ymin, xmax, ymax = boxes[i]
-        rect = plt.Rectangle((xmin, ymin), xmax - xmin, ymax - ymin, fill=False, edgecolor='red',
+        index = map_dict[classes[i]]
+        rect = plt.Rectangle((xmin, ymin), xmax - xmin, ymax - ymin, fill=False, edgecolor=tuple(color[index + 1]),
                              label=f"{classes[i]}:{probs[i]}")
-        ax.text(xmin, ymin - 5, f"{classes[i]}:{probs[i]}", fontsize=5, color='red',
-                bbox=dict(boxstyle='round,pad=0.5', fc='yellow', ec='blue', lw=2, alpha=0.7))
+        ax.text(xmin, ymin - 5, f"{classes[i]}:{probs[i]}", fontsize=5, color='white',
+                bbox=dict(boxstyle='round,pad=0.5', fc=tuple(color[index + 1]), ec=tuple(color[index + 1]), lw=2, alpha=0.7))
         ax.add_patch(rect)
     plt.imshow(img.permute(1, 2, 0))
     plt.savefig(f"./pics/{k}.pdf")

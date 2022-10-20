@@ -14,7 +14,7 @@ parser = argparse.ArgumentParser(description="object detection")
 
 # dataset
 parser.add_argument('--data', type=str, default='VOC', help='name of dataset')
-parser.add_argument('--root_path', type=str, default="C:/Users/98311/Downloads", help='root path of dataset')
+parser.add_argument('--root_path', type=str, default="C:/Users/98311/Documents/datasets", help='root path of dataset')
 parser.add_argument('--trainval_year', type=int, default=2012, help='year of VOC dataset')
 parser.add_argument('--json_file', type=str, default='./data/pascal_classes_2007.json',
                     help="json file of class mapping")
@@ -74,7 +74,7 @@ if __name__ == '__main__':
     print(f'backbone: {args.backbone}')
     model = YOLO_V1(args.backbone, 7, 2, 20).to(device)
     model.load_state_dict(torch.load(f"./checkpoints/{args.model_path}"))
-    train(args, model, device)
+    # train(args, model, device)
     detect(args, model, device)
     eval = VOCMetric()
     map = eval.evaluate()

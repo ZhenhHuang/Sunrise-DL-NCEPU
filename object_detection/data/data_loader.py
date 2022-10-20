@@ -9,7 +9,7 @@ from object_detection.utils import target_encode, target_decode
 
 
 class VOCDataset(Dataset):
-    def __init__(self, root_path="C:\Users\98311\Documents\datasets",
+    def __init__(self, root_path="C:/Users/98311/Documents/datasets",
                  year=2007, flag="train", transform=None, json_file='./pascal_classes_2007.json',
                  S=7, B=2, return_size=False, **kwargs):
         super(VOCDataset, self).__init__()
@@ -20,7 +20,7 @@ class VOCDataset(Dataset):
         self.annotation_path = f"{self.root_path}/Annotations"
         self.image_path = f"{self.root_path}/JPEGImages"
         self.flag = flag
-        self.split_path = f"{self.root_path}/ImageSets/Main/{flag}.txt"
+        self.split_path = f"{self.root_path}/ImageSets/Main/{name}.txt"
         self.xml_list, self.image_list = self._get_xml_list()
         f = open(json_file)
         self.map_dict = json.load(f)
