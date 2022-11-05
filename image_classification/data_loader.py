@@ -1,11 +1,12 @@
 import torch
+import torchvision
+import torchvision.transforms as transforms
 from torch.utils.data import Dataset, DataLoader
-import matplotlib.pyplot as plt
+from torchvision.transforms import InterpolationMode
 import numpy as np
 import os
 import zipfile
-import cv2
-from utils.preprocess import flip, noise, rotation
+from PIL import Image
 
 
 def unzip(src, dst):
@@ -17,57 +18,41 @@ def unzip(src, dst):
         raise FileNotFoundError
 
 
-def normalize(img):
-    # H, W, C
-    # mean = img.mean()
-    # std = img.std()
-    return img / 255.
-
-
-def image_augment(img):
-    opt = np.random.uniform(0, 1)
-
-    def get_method(opt):
-        if opt < 0.25:
-            return flip
-        elif opt < 0.5:
-            return rotation
-        elif opt < 0.75:
-            return noise
-        else:
-            return None
-
-    method = get_method(opt)
-    return method(img) if method is not None else img
-
-
-note = r"C:/Users/98311/PycharmProjects/PaddleProjects/data/data146107"
-
-
 class Caltech101(Dataset):
-    def __init__(self, root_path=note, data_path='dataset', flag='train', size=None, abandon=True, factor=2):
+    def __init__(self, root_path='./datasets', data_path='caltech101', flag='train', size=None, transform=None):
         super(Caltech101, self).__init__()
         assert flag in ['train', 'val', 'test', 'pred']
         self.root_path = root_path
         self.data_path = data_path
         self.flag = flag
-        self.abandon = abandon
-        self.factor = factor
-        if flag == 'pred' and abandon:
-            self.abandon = False
         if size is None:
-            self.height = 200
-            self.width = 200
+            self.height = 288
+            self.width = 288
         else:
             self.height = size[0]
             self.width = size[1]
+        if transform is None:
+            self.transform = transforms.Compose([
+                transforms.ToTensor(),
+                transforms.RandomRotation((-90, 90), interpolation=InterpolationMode.BILINEAR),
+                transforms.Resize((self.height, self.width)),
+                transforms.Normalize([0.4914, 0.4822, 0.4465], [0.2023, 0.1994, 0.2010]),
+            ])
+        if flag != 'train':
+            self.transform = transforms.Compose([
+                transforms.ToTensor(),
+                transforms.Resize((self.height, self.width)),
+                transforms.Normalize([0.4914, 0.4822, 0.4465], [0.2023, 0.1994, 0.2010])
+            ])
         self.__read_data__()
 
     def __getitem__(self, index):
-        if self.flag == 'pred':
-            return self.data[index], self.data_names[index]
-        else:
-            return self.data[index], self.label[index]
+        data = Image.open(self.data[index], mode='r')
+        data = self.transform(data.convert('RGB'))
+        if self.flag != 'pred':
+            label = self.label[index]
+            return data, torch.tensor(label)
+        return data
 
     def __len__(self):
         return len(self.data)
@@ -86,8 +71,9 @@ class Caltech101(Dataset):
         f = open(target_path)
         data = []
         label = []
-        data_names = []
+        self.data_names = []
         lines = f.readlines()
+        f.close()
 
         if self.flag != "pred":
             mapping = {'train': 0, 'val': 1, 'test': 2}
@@ -103,23 +89,14 @@ class Caltech101(Dataset):
         for line in lines:
             if self.flag != 'pred':
                 pic_name, cls = line.split()
+                label.append(int(cls))
             else:
                 pic_name = line.strip()
-            data_names.append(pic_name)
-            img = cv2.imread(f'{path}/images/{pic_name}')
-            # img = self.__preprocess(img, self.abandon, self.factor)
-            # if self.flag != 'pred':
-            #     img = image_augment(img)
-            img = cv2.resize(img, (self.height, self.width), interpolation=cv2.INTER_LINEAR)
-            if img is not None:
-                if self.flag != 'pred':
-                    label.append(int(cls))
-                data.append(normalize(img))
-        f.close()
+                self.data_names.append(pic_name.split(".")[0])
+            data.append(f'{path}/images/{pic_name}')
 
-        self.data = np.array(data)
+        self.data = data
         self.label = np.array(label)
-        self.data_names = data_names
 
     def __getCountDict(self):
         self.count_dict = {}
@@ -135,48 +112,96 @@ class Caltech101(Dataset):
         f.close()
         return map_dict
 
-    def __preprocess(self, img, abandon=True, factor=2, resize_only=True):
-        H, W, C = img.shape
-        if resize_only:
-            img = img = cv2.resize(img, (self.height, self.width), interpolation=cv2.INTER_LINEAR)
-            return img
-        if H > factor * self.height or W > factor * self.width or H < self.height // factor or W < self.width // factor:
-            if abandon:
-                return None
-            else:
-                img = cv2.resize(img, (self.height, self.width), interpolation=cv2.INTER_LINEAR)
-                return img
 
-        if H < self.height:
-            pad = self.height - H
-            img = cv2.copyMakeBorder(img, pad // 2, pad - pad // 2, 0, 0, cv2.BORDER_CONSTANT, value=(0, 0, 0))
-        if W < self.width:
-            pad = self.width - W
-            img = cv2.copyMakeBorder(img, 0, 0, pad // 2, pad - pad // 2, cv2.BORDER_CONSTANT, value=(0, 0, 0))
-        if H > self.height:
-            crop = H - self.height
-            img = img[crop // 2:crop // 2 - crop, :, :]
-        if W > self.width:
-            crop = W - self.width
-            img = img[:, crop // 2:crop // 2 - crop, :]
-        return img
+def load_MNIST(root_path='./datasets/CIFAR', flag='train', download=False, transform=None):
+    if not os.path.exists(root_path):
+        os.mkdir(root_path)
+    if flag == 'train':
+        mnist_data_train = torchvision.datasets.MNIST(root_path, train=True, download=download, transform=transform)
+        return mnist_data_train
+    else:
+        mnist_data_test = torchvision.datasets.MNIST(root_path, train=False, download=False, transform=transform)
+        return mnist_data_test
 
 
-def getLoader(args, flag):
+def load_CIFAR_10(root_path='./datasets/CIFAR-10', flag='train', download=False, transform=None):
+    if not os.path.exists(root_path):
+        os.mkdir(root_path)
+    CIFAR = torchvision.datasets.CIFAR10
+    if transform is None:
+        transform = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.RandomRotation((-90, 90), interpolation=InterpolationMode.BILINEAR),
+            transforms.Normalize([0.4914, 0.4822, 0.4465], [0.2023, 0.1994, 0.2010]),
+        ])
+    if flag == 'train':
+        cifar_data_train = CIFAR(root_path, train=True, download=download, transform=transform)
+        return cifar_data_train
+    else:
+        if transform is None:
+            transform = transforms.Compose([
+                transforms.ToTensor(),
+                transforms.Normalize([0.4914, 0.4822, 0.4465], [0.2023, 0.1994, 0.2010]),
+            ])
+        cifar_data_test = CIFAR(root_path, train=False, download=False, transform=transform)
+        return cifar_data_test
+
+
+def load_CIFAR_100(root_path='./datasets/CIFAR-100', flag='train', download=False, transform=None):
+    if not os.path.exists(root_path):
+        os.mkdir(root_path)
+    CIFAR = torchvision.datasets.CIFAR100
+    if transform is None:
+        transform = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.RandomRotation((-90, 90), interpolation=InterpolationMode.BILINEAR),
+            transforms.Normalize([0.4914, 0.4822, 0.4465], [0.2023, 0.1994, 0.2010]),
+        ])
+    if flag == 'train':
+        cifar_data_train = CIFAR(root_path, train=True, download=download, transform=transform)
+        return cifar_data_train
+    else:
+        if transform is None:
+            transform = transforms.Compose([
+                transforms.ToTensor(),
+                transforms.Normalize([0.4914, 0.4822, 0.4465], [0.2023, 0.1994, 0.2010]),
+            ])
+        cifar_data_test = CIFAR(root_path, train=False, download=False, transform=transform)
+        return cifar_data_test
+
+
+def getLoader(args, flag, transform=None):
     if flag == 'train':
         batch_size = args.batch_size
         shuffle = True
         drop_last = True
-    elif flag == 'pred':
+    elif flag == 'test' or flag == 'pred':
         batch_size = 1
         shuffle = False
         drop_last = False
     else:
-        batch_size = 1
+        batch_size = args.batch_size
         shuffle = False
         drop_last = True
-    dataset = Caltech101(args.root_path, args.data_path, flag, args.size, args.abandon, args.factor)
+
+    dataset = getDataset(args, flag, transform)
     print(f"{flag}: {len(dataset)}")
     data_loader = DataLoader(dataset, batch_size=batch_size, shuffle=shuffle, drop_last=drop_last)
     return dataset, data_loader
 
+
+def getDataset(args, flag, transform):
+    if args.data == 'caltech101':
+        return Caltech101(args.root_path, args.data_path, flag, args.size, transform=transform)
+
+    elif args.data == 'mnist':
+        return load_MNIST(flag=flag, download=args.download)
+
+    elif args.data == 'cifar-10':
+        return load_CIFAR_10(flag=flag, download=args.download, transform=transform)
+
+    elif args.data == 'cifar-100':
+        return load_CIFAR_100(flag=flag, download=args.download, transform=transform)
+
+    else:
+        raise NotImplementedError

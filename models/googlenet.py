@@ -1,6 +1,5 @@
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 
 
 class Inception(nn.Module):
@@ -39,7 +38,7 @@ class Inception(nn.Module):
 
 
 class GoogleNet(nn.Module):
-    def __init__(self, in_channel=3, hidden_channel=64, n_classes=102):
+    def __init__(self, in_channel=3, hidden_channel=64, n_classes=102, dropout=0.2):
         super(GoogleNet, self).__init__()
         self.block1 = nn.Sequential(
             nn.Conv2d(in_channel, hidden_channel, kernel_size=7, stride=2, padding=3),
@@ -69,26 +68,29 @@ class GoogleNet(nn.Module):
         self.block5 = nn.Sequential(
             Inception(832, 256, (160, 320), (32, 128), 128),
             Inception(832, 384, (192, 384), (48, 128), 128),
-            nn.AdaptiveAvgPool2d((1, 1)),
-            nn.Flatten()
         )
-        self.layers = nn.Sequential(
+        self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
+        self.backbone = nn.Sequential(
             self.block1,
             self.block2,
             self.block3,
             self.block4,
             self.block5
         )
-        self.project = nn.Linear(1024, n_classes)
+        self.dropout = nn.Dropout(0.2)
+        self.fc = nn.Linear(1024, n_classes)
 
     def forward(self, x):
-        x = self.layers(x)
-        # print(x.shape)
-        x = self.project(x)
+        x = self.backbone(x)
+        x = self.avgpool(x)
+        x = torch.flatten(x, 1)
+        x = self.dropout(x)
+        x = self.fc(x)
         return x
 
 
 if __name__ == '__main__':
+    # testing
     device = torch.device('cuda:0')
     x = torch.rand(size=(1, 3, 256, 256)).to(device)
     model = GoogleNet().to(device)

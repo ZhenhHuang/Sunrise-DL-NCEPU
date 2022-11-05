@@ -9,14 +9,9 @@ __pycache__/
 .idea/
 
 #Project
-/datasets/CIFAR-10/*.gz
-/datasets/CIFAR-10/cifar-10-batches-py
-/datasets/MNIST/*
-/datasets/*.zip
-/datasets/caltech101/*.zip
-/datasets/PascalVOC2007/*
-/results/*
-/object_detection/results/*
+/image_classification/datasets/*
+/image_classification/checkpoints/*
+/image_classification/results/*
 *.pt
 
 /object_detection/results/*
