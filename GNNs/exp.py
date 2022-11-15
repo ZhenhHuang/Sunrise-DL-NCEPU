@@ -64,6 +64,7 @@ class Exp:
         model = self.model(**vars(self.configs)).to(self.device)
         optimizer = self._select_optim(model)
         criterion = self._select_criterion()
+        earlystopping = EarlyStopping(patience=self.configs.patience)
         model.train()
         for epoch in range(self.configs.epochs):
             out = model(x, edge_index)[mask_train]
@@ -76,6 +77,12 @@ class Exp:
             if epoch % 20 == 0:
                 print(f'epoch: {epoch}, train loss: {loss.item()}, train acc: {acc*100}%\n '
                       f'\t\t vallid loss: {val_loss}, valid acc: {val_acc*100}%\n')
+                earlystopping(val_loss, model, self.configs.model_path)
+
+            if earlystopping.early_stop:
+                print('Early stopping')
+                break
+
         test_loss, test_acc = self.test(model)
         print(f'test loss: {test_loss}, test acc: {test_acc*100}%\n')
 

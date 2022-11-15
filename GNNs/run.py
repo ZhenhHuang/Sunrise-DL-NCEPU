@@ -28,7 +28,8 @@ parser.add_argument('--activation', type=str, default='relu', help='activate fun
 parser.add_argument('--epochs', type=int, default=200, help='epochs for training')
 parser.add_argument('--lr', type=float, default=1e-2, help='learning_rate')
 parser.add_argument('--weight_decay', type=float, default=5e-4, help='rate of weight_decay')
-parser.add_argument('--model_path', type=str, default='model.pt', help='path for saving models')
+parser.add_argument('--model_path', type=str, default='gcn.pt', help='path for saving models')
+parser.add_argument('--patience', type=int, default=3, help='patience of early stopping')
 
 # GPU
 parser.add_argument('--use_gpu', action='store_false', help='use gpu')
