@@ -4,6 +4,7 @@ import torch.optim
 import time
 from data_loader import Cora
 from GNNs.models.gcn import GCN
+from GNNs.models.gat import GAT
 from GNNs.tools import EarlyStopping, adjust_learning_rate
 
 
@@ -15,7 +16,8 @@ class Exp:
 
     def _select_model(self):
         model_dicts = {
-            'gcn': GCN
+            'gcn': GCN,
+            'gat': GAT
         }
         self.model = model_dicts[self.configs.model]
 
@@ -81,7 +83,7 @@ class Exp:
 
             if earlystopping.early_stop:
                 print('Early stopping')
-                break
+                # break
 
         test_loss, test_acc = self.test(model)
         print(f'test loss: {test_loss}, test acc: {test_acc*100}%\n')

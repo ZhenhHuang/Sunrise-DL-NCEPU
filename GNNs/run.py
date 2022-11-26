@@ -17,16 +17,20 @@ parser.add_argument('--root_path', type=str, default='./datasets/', help='root p
 parser.add_argument('--data', type=str, default='cora', help='name of datasets')
 
 # model
-parser.add_argument('--model', type=str, default='gcn', help='model for experience')
+parser.add_argument('--model', type=str, default='gat', help='model for experience')
 parser.add_argument('--in_features', type=int, default=1433, help='dimension of features')
-parser.add_argument('--hidden_features', type=int, default=16, help='dimension of hidden features')
+parser.add_argument('--hidden_features', type=int, default=64, help='dimension of hidden features')
 parser.add_argument('--num_classes', type=int, default=7, help='number of classes')
-parser.add_argument('--dropout', type=float, default=0.5, help='dropout')
+parser.add_argument('--dropout', type=float, default=0.6, help='dropout')
 parser.add_argument('--activation', type=str, default='relu', help='activate function')
+
+# for GAT
+parser.add_argument('--n_heads', type=list, default=[8, 1], help='number of heads for attention layer')
+parser.add_argument('--alpha', type=float, default=0.2, help='slop of leaky relu')
 
 # train
 parser.add_argument('--epochs', type=int, default=200, help='epochs for training')
-parser.add_argument('--lr', type=float, default=1e-2, help='learning_rate')
+parser.add_argument('--lr', type=float, default=0.005, help='learning_rate')
 parser.add_argument('--weight_decay', type=float, default=5e-4, help='rate of weight_decay')
 parser.add_argument('--model_path', type=str, default='gcn.pt', help='path for saving models')
 parser.add_argument('--patience', type=int, default=3, help='patience of early stopping')
