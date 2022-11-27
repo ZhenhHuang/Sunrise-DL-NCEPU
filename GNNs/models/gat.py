@@ -20,7 +20,8 @@ class GraphAttentionLayer(nn.Module):
         x = self.linear(x).reshape(N, self.n_heads, -1)     # N, H, F
         attn = torch.einsum('nhf, fi->nhi', x, self.weights.reshape(-1, 2))   # N, H, 2
         attn = attn[:, :, 0].unsqueeze(0) + attn[:, :, 1].unsqueeze(1)  # N_1, N_2, H
-        attn = torch.masked_fill(F.leaky_relu(attn, self.alpha), mask=~adj.bool().to_dense().unsqueeze(-1), value=-torch.inf)
+        attn = F.leaky_relu(attn, self.alpha)
+        attn = torch.masked_fill(attn, mask=~adj.bool().to_dense().unsqueeze(-1), value=-torch.inf)
         scores = torch.softmax(attn, dim=1)
         out = torch.einsum('ijh, jhf->ihf', self.dropout(scores), x).reshape(N, -1)
         return out
