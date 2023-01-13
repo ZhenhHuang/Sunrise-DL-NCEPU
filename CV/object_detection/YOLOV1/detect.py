@@ -1,6 +1,6 @@
 import torch
 from utils import target_decode, NonMaximalSuppression
-from object_detection.data.data_factory import data_factory
+from data.data_factory import data_factory
 from tools import visualize
 from torchvision.transforms import Resize
 

@@ -9,14 +9,14 @@ __pycache__/
 .idea/
 
 #Project
-/image_classification/datasets/*
-/image_classification/checkpoints/*
-/image_classification/results/*
+CV/image_classification/datasets/*
+CV/image_classification/checkpoints/*
+CV/image_classification/results/*
 *.pt
 
-/object_detection/results/*
-/object_detection/checkpoints/*
-/object_detection/pics/*
+CV/YOLOV1/object_detection/results/*
+CV/YOLOV1/object_detection/checkpoints/*
+CV/YOLOV1/object_detection/pics/*
 
-/GNNs/datasets/*
-/GNNs/checkpoints/*
+GNNs/datasets/*
+GNNs/checkpoints/*

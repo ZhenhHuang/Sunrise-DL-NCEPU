@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
 import time
-from object_detection.data.data_factory import data_factory
+from data.data_factory import data_factory
 from tools import EarlyStopping, adjust_learning_rate, choose_optim, choose_loss
 
 

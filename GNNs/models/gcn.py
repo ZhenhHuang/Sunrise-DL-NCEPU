@@ -8,9 +8,12 @@ class GraphConvolution(nn.Module):
         super(GraphConvolution, self).__init__()
         self.linear = nn.Linear(in_features, out_features, bias=bias)
 
-    def forward(self, x, adj):
+    def forward(self, x, adj, is_sparse=True):
         x = self.linear(x)
-        x = torch.spmm(adj, x)
+        if is_sparse:
+            x = torch.spmm(adj, x)
+        else:
+            x = torch.matmul(adj, x)
         return x
 
 

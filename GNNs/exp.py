@@ -5,7 +5,7 @@ import time
 from data_loader import Cora
 from GNNs.models.gcn import GCN
 from GNNs.models.gat import GAT
-from GNNs.tools import EarlyStopping, adjust_learning_rate
+from GNNs.tools import EarlyStopping
 
 
 class Exp:

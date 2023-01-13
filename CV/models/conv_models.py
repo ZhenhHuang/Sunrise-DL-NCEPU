@@ -52,6 +52,7 @@ class ResNetBlock(nn.Module):
         out = F.relu(out)
         return out
 
+
 class ResNet18(nn.Module):
     def __init__(self, in_channels=3, out_dims=10):
         """_summary_
