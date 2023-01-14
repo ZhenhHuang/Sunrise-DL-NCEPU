@@ -2,7 +2,6 @@ import torch
 import torch.nn as nn
 
 
-
 class GraphConvolution(nn.Module):
     def __init__(self, in_features, out_features, bias=True):
         super(GraphConvolution, self).__init__()
@@ -12,6 +11,15 @@ class GraphConvolution(nn.Module):
         x = self.linear(x)
         x = torch.spmm(adj, x)
         return x
+
+
+class Attentive(nn.Module):
+    def __init__(self, in_features):
+        super(Attentive, self).__init__()
+        self.weights = nn.Parameter(torch.ones(in_features))
+
+    def forward(self, x):
+        return x * self.weights
 
 
 class SparseDropout(nn.Module):
@@ -25,3 +33,7 @@ class SparseDropout(nn.Module):
         value = x._values()[mask] / (1 - self.prob)
         return torch.sparse_coo_tensor(idx, value, x.shape)
 
+
+if __name__ == '__main__':
+    gcn = GraphConvolution(1, 1)
+    gcn.weight = nn.Parameter(torch.ones(1, 1))
