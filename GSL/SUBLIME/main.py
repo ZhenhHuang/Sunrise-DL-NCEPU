@@ -21,7 +21,7 @@ parser.add_argument('--k_neighbours', type=int, default=30, help='numbers of K n
 parser.add_argument('--knn_metric', type=str, default='cosine', choices=['cosine', 'minkowski'])
 parser.add_argument('--activation', type=str, default='relu', choices=['relu', 'tanh'])
 parser.add_argument('--alpha', type=float, default=1., help='alpha for elu')
-parser.add_argument('--slope', type=float, default=6., help='slope for elu input, elu(slope(x-1))')
+parser.add_argument('--slope', type=float, default=6., help='slope for elu input, elu(slope * (x-1)) + alpha')
 parser.add_argument('--n_layers', type=int, default=2)
 
 
