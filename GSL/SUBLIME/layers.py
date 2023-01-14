@@ -32,8 +32,3 @@ class SparseDropout(nn.Module):
         idx = x._indices()[:, mask]
         value = x._values()[mask] / (1 - self.prob)
         return torch.sparse_coo_tensor(idx, value, x.shape)
-
-
-if __name__ == '__main__':
-    gcn = GraphConvolution(1, 1)
-    gcn.weight = nn.Parameter(torch.ones(1, 1))
