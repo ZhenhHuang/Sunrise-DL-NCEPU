@@ -43,7 +43,6 @@ class GraphEncoder(nn.Module):
 
     def forward(self, x, adj):
         adj = self.dropout_adj(adj)
-
         for layer in self.encoder_layers[:-1]:
             x = self.dropout_node(F.relu(layer(x, adj)))
         x = self.encoder_layers[-1](x, adj)
@@ -80,8 +79,3 @@ class GCL(nn.Module):
             loss = pos_sim / (sim_matrix.sum(dim=-1) - pos_sim)
             loss = -torch.log(loss).mean()
         return loss
-
-
-
-torch.sparse_coo_tensor()
-

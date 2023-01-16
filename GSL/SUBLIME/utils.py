@@ -50,6 +50,24 @@ def get_masked_features(features, mask_prob):
     return features * mask
 
 
+def normalize(adj, mode):
+    if mode == 'sym':
+        degree_matrix = 1. / (torch.sqrt(adj.sum(-1)) + 1e-5)
+        return degree_matrix[:, None] * adj * degree_matrix[None, :]
+    elif mode == 'row':
+        degree_matrix = 1. / (adj.sum(-1) + 1e-5)
+        return degree_matrix[:, None] * adj
+
+
+def split_batch(nodes_idx, batch_size):
+    count = len(nodes_idx) // batch_size
+    split_result = []
+    for i in range(count):
+        split_result.append(nodes_idx[i*batch_size: (i+1)*batch_size])
+    if len(nodes_idx) % batch_size != 0:
+        split_result.append(nodes_idx[count * batch_size:])
+    return split_result
+
 
 
 
