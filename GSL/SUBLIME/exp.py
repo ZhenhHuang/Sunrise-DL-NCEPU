@@ -55,7 +55,7 @@ class Exp:
 
     def evaluate_adj_by_cls(self, adj, features, in_features, labels, n_classes, masks):
         """masks = (train, val, test)"""
-        device = features.device
+        device = self.device
         cls_model = GCN(in_features, self.configs.hidden_features_cls, n_classes, self.configs.n_layers_cls,
                         self.configs.dropout_node_cls, self.configs.dropout_edge_cls).to(device)
         optimizer = torch.optim.Adam(cls_model.parameters(), lr=self.configs.lr_cls, weight_decay=self.configs.w_decay_cls)
@@ -64,15 +64,15 @@ class Exp:
         early_stop_count = 0
         best_model = None
 
-        print("\n--------------------------Evaluate_Adj_By_Cls-------------------------")
-        print("--------------------------Training-------------------------")
-        for epoch in range(self.configs.epochs_cls):
+        # print("\n--------------------------Evaluate_Adj_By_Cls-------------------------")
+        # print("--------------------------Training-------------------------")
+        for epoch in range(1, self.configs.epochs_cls + 1):
             cls_model.train()
             loss, acc = self.cal_cls_loss(cls_model, masks[0], adj, features, labels)
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-            print(f"Epoch {epoch}: train_loss={loss.item()}, train_accuracy={acc}")
+            # print(f"Epoch {epoch}: train_loss={loss.item()}, train_accuracy={acc}")
             if epoch % 10 == 0:
                 cls_model.eval()
                 val_loss, acc = self.cal_cls_loss(cls_model, masks[1], adj, features, labels)
@@ -83,15 +83,15 @@ class Exp:
                     best_model = cls_model
                 else:
                     early_stop_count += 1
-                    print(f"Early Stopping Count={early_stop_count}/{self.configs.patience_cls}")
+                    # print(f"Early Stopping Count={early_stop_count}/{self.configs.patience_cls}")
                 if early_stop_count >= self.configs.patience_cls:
-                    print("Early Stopping")
+                    # print("Early Stopping")
                     break
-        print("--------------------------Testing-------------------------")
+        # print("--------------------------Testing-------------------------")
         best_model.eval()
         test_loss, test_acc = self.cal_cls_loss(best_model, masks[2], adj, features, labels)
-        print(f"Test Loss: {test_loss}, Test Accuracy: {test_acc}")
-        print("----------------------------------------------------------\n")
+        # print(f"Test Loss: {test_loss}, Test Accuracy: {test_acc}")
+        # print("----------------------------------------------------------\n")
         return best_acc, test_acc, best_model
 
     def train(self):
@@ -139,7 +139,7 @@ class Exp:
 
         print("--------------------------Train SUBLIME-------------------------")
 
-        for epoch in range(self.configs.epochs):
+        for epoch in range(1, self.configs.epochs + 1):
             model.train()
             graph_learner.train()
             loss, adj = self.cal_loss_gcl(model, graph_learner, features, anchor_adj)
