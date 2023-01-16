@@ -15,7 +15,7 @@ class FGP_learner(nn.Module):
         self.alpha = alpha
 
     def forward(self, x):
-        adj = F.elu(self.slope(self.adj - 1), alpha=self.alpha) + self.alpha
+        adj = F.elu(self.slope * (self.adj - 1), alpha=self.alpha) + self.alpha
         return adj
 
 

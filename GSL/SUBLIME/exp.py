@@ -25,23 +25,23 @@ class Exp:
         return features, in_features, label, adj, masks, n_classes
 
     def cal_cls_loss(self, model, mask, adj, features, labels):
-        out = model(features, adj)
+        out = model(features, adj.to_sparse())
         loss = F.cross_entropy(out[mask], labels[mask])
-        acc = cal_accuracy(out, features)
+        acc = cal_accuracy(out[mask], labels[mask])
         return loss, acc
 
     def cal_loss_gcl(self, model, graph_learner, features, anchor_adj):
         """anchor view"""
         aug_feats_anchor = get_masked_features(features, self.configs.maskfeat_prob_anchor)
-        z_anchor, _ = model(aug_feats_anchor, anchor_adj)
+        z_anchor, _ = model(aug_feats_anchor, anchor_adj.to_sparse())
 
         """learner view"""
         learner_adj = graph_learner(features)
         learner_adj = (learner_adj + learner_adj.t()) / 2.  # symmetrize
-        learner_adj = normalize(learner_adj)
+        learner_adj = normalize(learner_adj, mode="sym")
 
         aug_feats_learner = get_masked_features(features, self.configs.maskfeat_prob_learner)
-        z_learner, _ = model(aug_feats_learner, learner_adj)
+        z_learner, _ = model(aug_feats_learner, learner_adj.to_sparse())
 
         if self.configs.contract_batch_size > 0:
             nodes_idx = list(range(features.shape[0]))
@@ -64,10 +64,10 @@ class Exp:
         early_stop_count = 0
         best_model = None
 
-        print("--------------------------Evaluate_Adj_By_Cls-------------------------")
+        print("\n--------------------------Evaluate_Adj_By_Cls-------------------------")
         print("--------------------------Training-------------------------")
-        cls_model.train()
         for epoch in range(self.configs.epochs_cls):
+            cls_model.train()
             loss, acc = self.cal_cls_loss(cls_model, masks[0], adj, features, labels)
             optimizer.zero_grad()
             loss.backward()
@@ -80,7 +80,6 @@ class Exp:
                 if acc > best_acc:
                     early_stop_count = 0
                     best_acc = acc
-                    # torch.save(cls_model, self.configs.save_path_cls)
                     best_model = cls_model
                 else:
                     early_stop_count += 1
@@ -92,6 +91,7 @@ class Exp:
         best_model.eval()
         test_loss, test_acc = self.cal_cls_loss(best_model, masks[2], adj, features, labels)
         print(f"Test Loss: {test_loss}, Test Accuracy: {test_acc}")
+        print("----------------------------------------------------------\n")
         return best_acc, test_acc, best_model
 
     def train(self):
@@ -138,9 +138,10 @@ class Exp:
         anchor_adj = normalize(anchor_adj, mode='sym').to(device)
 
         print("--------------------------Train SUBLIME-------------------------")
-        model.train()
-        graph_learner.train()
+
         for epoch in range(self.configs.epochs):
+            model.train()
+            graph_learner.train()
             loss, adj = self.cal_loss_gcl(model, graph_learner, features, anchor_adj)
             optimizer_gcl.zero_grad()
             optimizer_learner.zero_grad()
@@ -154,10 +155,11 @@ class Exp:
             print(f"Epoch {epoch}: train_loss={loss.item()}")
 
             if epoch % self.configs.eval_freq == 0:
+                print("---------------Evaluation Start-----------------")
                 if self.configs.downstream_task == 'classification':
                     model.eval()
                     graph_learner.eval()
-                    val_acc, test_acc, _ = self.evaluate_adj_by_cls(adj, features, in_features, label, n_classes, masks)
+                    val_acc, test_acc, _ = self.evaluate_adj_by_cls(adj.detach(), features, in_features, label, n_classes, masks)
                     print(f"Epoch {epoch}: val_accuracy={val_acc.item()}, test_accuracy={test_acc}")
                     if val_acc > best_val:
                         best_val = val_acc

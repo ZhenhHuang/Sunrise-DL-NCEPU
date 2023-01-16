@@ -6,7 +6,7 @@ import numpy as np
 
 def k_nearest_neighbors(x, k_neighbours, metric):
     adj = kneighbors_graph(x, k_neighbours, metric=metric)
-    adj = adj.toarray()
+    adj = adj.toarray().astype(np.float32)
     return adj
 
 
