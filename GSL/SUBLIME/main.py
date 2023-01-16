@@ -30,6 +30,9 @@ parser.add_argument('--slope', type=float, default=6., help='slope for elu input
 parser.add_argument('--n_layers_gsl', type=int, default=2)
 parser.add_argument('--temperature', type=float, default=0.2, help='temperature of NT-Xent loss')
 
+# data augmentation
+parser.add_argument('--maskfeat_prob_anchor', type=float, default=0.2, help='probability of feature mask for anchor view')
+parser.add_argument('--maskfeat_prob_learner', type=float, default=0.2, help='probability of feature mask for learner view')
 
 # Evaluation NetWork for Classification
 parser.add_argument('--hidden_features_cls', type=int, default=32)

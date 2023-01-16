@@ -32,3 +32,30 @@ def apply_non_linearity(x, non_linear_func, slope, alpha):
         return x
     else:
         raise NotImplementedError('the non_linear_function is not implemented')
+
+
+def cal_accuracy(preds, trues):
+    preds = torch.argmax(preds, dim=-1)
+    correct = (preds == trues).sum()
+    return correct / trues.shape[0]
+
+
+def get_masked_features(features, mask_prob):
+    D = features.shape[-1]
+    if int(mask_prob * D) == 0:
+        return features
+    mask = torch.ones(D, device=features.device)
+    drop_index = np.random.choice(D, size=int(mask_prob * D), replace=False)
+    mask[drop_index] = 0.
+    return features * mask
+
+
+
+
+
+
+
+
+
+
+
