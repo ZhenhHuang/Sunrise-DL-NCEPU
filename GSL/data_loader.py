@@ -41,10 +41,10 @@ class Cora:
             id1, id2 = idx_map[cites.iloc[i, 0]], idx_map[cites.iloc[i, 1]]
             edges[id1, id2] = 1.
             edges[id2, id1] = 1.
-        self.edge_index = edges.to_sparse_csr().float()
+        self.edge_index = edges.float()
         self.mask_train = range(140)
-        self.mask_val = range(200, 500)
-        self.mask_test = range(500, 1500)
+        self.mask_val = range(140, 640)
+        self.mask_test = range(1708, 2708)
 
     def __len__(self):
         return 1

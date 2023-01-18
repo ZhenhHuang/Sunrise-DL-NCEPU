@@ -17,7 +17,7 @@ parser.add_argument('--root_path', type=str, default='./datasets/', help='root p
 parser.add_argument('--data', type=str, default='cora', help='name of datasets')
 
 # model
-parser.add_argument('--model', type=str, default='gat', help='model for experience')
+parser.add_argument('--model', type=str, default='gcn', help='model for experience')
 parser.add_argument('--in_features', type=int, default=1433, help='dimension of features')
 parser.add_argument('--hidden_features', type=int, default=64, help='dimension of hidden features')
 parser.add_argument('--num_classes', type=int, default=7, help='number of classes')

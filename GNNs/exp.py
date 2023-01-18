@@ -79,10 +79,10 @@ class Exp:
             if epoch % 20 == 0:
                 print(f'epoch: {epoch}, train loss: {loss.item()}, train acc: {acc*100}%\n '
                       f'\t\t vallid loss: {val_loss}, valid acc: {val_acc*100}%\n')
-                earlystopping(val_loss, model, self.configs.model_path)
+                # earlystopping(val_loss, model, self.configs.model_path)
 
-            if earlystopping.early_stop:
-                print('Early stopping')
+            # if earlystopping.early_stop:
+                # print('Early stopping')
                 # break
 
         test_loss, test_acc = self.test(model)

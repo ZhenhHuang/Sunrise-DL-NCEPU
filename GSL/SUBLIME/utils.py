@@ -7,11 +7,12 @@ import numpy as np
 def k_nearest_neighbors(x, k_neighbours, metric):
     adj = kneighbors_graph(x, k_neighbours, metric=metric)
     adj = adj.toarray().astype(np.float32)
+    adj += np.eye(adj.shape[0])
     return adj
 
 
 def cal_similarity_graph(node):
-    return node @ node.transpose(-1, 1)
+    return node @ node.transpose(-1, -2)
 
 
 def graph_top_K(dense_adj, k):
@@ -37,7 +38,7 @@ def apply_non_linearity(x, non_linear_func, slope, alpha):
 def cal_accuracy(preds, trues):
     preds = torch.argmax(preds, dim=-1)
     correct = (preds == trues).sum()
-    return correct / trues.shape[0]
+    return correct / len(trues)
 
 
 def get_masked_features(features, mask_prob):
@@ -50,12 +51,27 @@ def get_masked_features(features, mask_prob):
     return features * mask
 
 
-def normalize(adj, mode):
-    if mode == 'sym':
-        degree_matrix = 1. / (torch.sqrt(adj.sum(-1)) + 1e-5)
-        return degree_matrix[:, None] * adj * degree_matrix[None, :]
-    elif mode == 'row':
-        degree_matrix = 1. / (adj.sum(-1) + 1e-5)
+def normalize(adj, mode, sparse=False):
+    if sparse:
+        # TODO: implement sparse form
+        adj = adj.coalesce()
+        if mode == 'sym':
+            degree_matrix = 1. / (torch.sqrt(torch.sparse.sum(adj, -1)))
+            value = degree_matrix[adj.indices()[0]] * degree_matrix[adj.indices()[1]]
+        elif mode == 'row':
+            degree_matrix = 1. / (torch.sparse.sum(adj, -1))
+            value = degree_matrix[adj.indices()[0]]
+        else:
+            raise NotImplementedError
+        return torch.sparse_coo_tensor(adj.indices(), value * adj.values(), adj.shape)
+    else:
+        if mode == 'sym':
+            degree_matrix = 1. / (torch.sqrt(adj.sum(-1)) + 1e-10)
+            return degree_matrix[:, None] * adj * degree_matrix[None, :]
+        elif mode == 'row':
+            degree_matrix = 1. / (adj.sum(-1) + 1e-5)
+        else:
+            raise NotImplementedError
         return degree_matrix[:, None] * adj
 
 

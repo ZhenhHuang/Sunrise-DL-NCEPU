@@ -5,31 +5,37 @@ from layers import GraphConvolution, SparseDropout
 
 
 class GCN(nn.Module):
-    def __init__(self, in_features, hidden_features, out_features, n_layers, dropout_node=0.5, dropout_edge=0.25):
+    def __init__(self, in_features, hidden_features, out_features, n_layers, dropout_node=0.5, dropout_edge=0.25,
+                 sparse=False):
         super(GCN, self).__init__()
         self.conv_layers = nn.ModuleList()
         self.conv_layers.append(GraphConvolution(in_features, hidden_features))
-        for _ in range(n_layers-2):
+        for _ in range(n_layers - 2):
             self.conv_layers.append(GraphConvolution(hidden_features, hidden_features))
         self.conv_layers.append(GraphConvolution(hidden_features, out_features))
         self.dropout_node = nn.Dropout(dropout_node)
-        self.dropout_edge = SparseDropout(dropout_edge)
+        self.dropout_edge = SparseDropout(dropout_edge) if sparse else nn.Dropout(dropout_edge)
+        self.sparse = sparse
 
     def forward(self, x, adj):
-        adj = self.dropout_edge(adj)
+        if self.sparse:
+            # TODO: implement sparse form
+            pass
+        else:
+            adj = self.dropout_edge(adj)
         for layer in self.conv_layers[: -1]:
-            x = layer(x, adj)
+            x = layer(x, adj, self.sparse)
             x = self.dropout_node(F.relu(x))
-        x = self.conv_layers[-1](x, adj)
+        x = self.conv_layers[-1](x, adj, self.sparse)
         return x
 
 
 class GraphEncoder(nn.Module):
     def __init__(self, n_layers, in_features, hidden_features, embed_features,
-                 proj_features, dropout, dropout_edge):
+                 proj_features, dropout, dropout_edge, sparse=False):
         super(GraphEncoder, self).__init__()
         self.dropout_node = nn.Dropout(dropout)
-        self.dropout_adj = SparseDropout(dropout_edge)
+        self.dropout_adj = SparseDropout(dropout_edge) if sparse else nn.Dropout(dropout_edge)
 
         self.encoder_layers = nn.ModuleList()
         self.encoder_layers.append(GraphConvolution(in_features, hidden_features))
@@ -40,22 +46,27 @@ class GraphEncoder(nn.Module):
         self.projection = nn.Sequential(nn.Linear(embed_features, proj_features),
                                         nn.ReLU(),
                                         nn.Linear(proj_features, proj_features))
+        self.sparse = sparse
 
     def forward(self, x, adj):
-        adj = self.dropout_adj(adj)
+        if self.sparse:
+            # TODO: implement sparse form
+            pass
+        else:
+            adj = self.dropout_adj(adj)
         for layer in self.encoder_layers[:-1]:
-            x = self.dropout_node(F.relu(layer(x, adj)))
-        x = self.encoder_layers[-1](x, adj)
+            x = self.dropout_node(F.relu(layer(x, adj, self.sparse)))
+        x = self.encoder_layers[-1](x, adj, self.sparse)
         z = self.projection(x)
         return z, x
 
 
 class GCL(nn.Module):
     def __init__(self, n_layers, in_features, hidden_features, embed_features,
-                 proj_features, dropout, dropout_edge):
+                 proj_features, dropout, dropout_edge, sparse=False):
         super(GCL, self).__init__()
         self.encoder = GraphEncoder(n_layers, in_features, hidden_features, embed_features,
-                 proj_features, dropout, dropout_edge)
+                                    proj_features, dropout, dropout_edge, sparse)
 
     def forward(self, x, adj):
         z, embedding = self.encoder(x, adj)

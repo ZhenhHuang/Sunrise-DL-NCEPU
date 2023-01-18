@@ -14,6 +14,7 @@ np.random.seed(seed)
 parser = argparse.ArgumentParser(description='SUBLIME')
 
 # Experiment settings
+parser.add_argument('--sparse', action='store_true', help='whether the input is sparse matrix form')
 parser.add_argument('--gsl_mode', type=str, default='structure_inference',
                     choices=['structure_inference', 'structure_refinement'])
 parser.add_argument('--downstream_task', type=str, default='classification',
@@ -53,10 +54,10 @@ parser.add_argument('--hidden_features_cls', type=int, default=32)
 parser.add_argument('--dropout_node_cls', type=float, default=0.5)
 parser.add_argument('--dropout_edge_cls', type=float, default=0.25)
 parser.add_argument('--n_layers_cls', type=int, default=2)
-parser.add_argument('--lr_cls', type=float, default=1e-3)
-parser.add_argument('--w_decay_cls', type=float, default=5e-4)
+parser.add_argument('--lr_cls', type=float, default=0.01)
+parser.add_argument('--w_decay_cls', type=float, default=1e-4)
 parser.add_argument('--epochs_cls', type=int, default=200)
-parser.add_argument('--patience_cls', type=int, default=10)
+parser.add_argument('--patience_cls', type=int, default=15)
 parser.add_argument('--save_path_cls', type=str, default='./checkpoints/cls.pth')
 
 # Structure Bootstrapping
