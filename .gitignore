@@ -9,6 +9,9 @@ __pycache__/
 .idea/
 
 #Project
+*/datasets/*
+*/checkpoints/*
+
 CV/image_classification/datasets/*
 CV/image_classification/checkpoints/*
 CV/image_classification/results/*
