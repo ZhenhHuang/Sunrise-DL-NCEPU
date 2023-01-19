@@ -24,4 +24,4 @@ CV/YOLOV1/object_detection/pics/*
 GNNs/datasets/*
 GNNs/checkpoints/*
 
-GSL/datasets/*
+#GSL/datasets/*
