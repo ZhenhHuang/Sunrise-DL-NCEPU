@@ -12,5 +12,5 @@ __pycache__/
 **/datasets/**
 !**/datasets/README.md
 */checkpoints/*
-**.pt
-**.pth
+**/*.pt
+**/*.pth

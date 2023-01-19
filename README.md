@@ -8,10 +8,14 @@ Institution: Sunrise Lab. **North China Electric Power University**. Deep Learni
   
 ## Introduction
   
-1. [Image Classification](./image_classification/)
-2. [Image segmentation](./image_segmentation/)
+1. [Image Classification](./CV/image_classification/)
+2. [Image segmentation](./CV/image_segmentation/)
 3. [Object Detection](./object_detection/)
 4. [Graph Neural Networks](./GNNs/)
+   1. [GCN](./GNNs/models/gcn.py)
+   2. [GAT](./GNNs/models/gat.py)
+5. [Graph Structure Learning](./GSL/)
+   1. [SUBLIME](./GSL/SUBLIME)
 
 ## Get Started
 
