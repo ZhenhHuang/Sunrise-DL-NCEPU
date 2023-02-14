@@ -42,7 +42,7 @@ class Exp:
         elif self.configs.learner_type == 'gnn':
             graph_learner = GNN_learner(self.configs.n_layers_gsl, in_features, self.configs.k_neighbours,
                                         self.configs.knn_metric,
-                                        self.configs.activation, self.configs.slope, self.configs.alpha, anchor_adj.cpu(),
+                                        self.configs.activation, self.configs.slope, self.configs.alpha, anchor_adj.to(self.device),
                                         self.configs.sparse)
         else:
             raise NotImplementedError
