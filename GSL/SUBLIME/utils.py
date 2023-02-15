@@ -71,7 +71,7 @@ def normalize(adj, mode, sparse=False):
             degree_matrix = 1. / (torch.sqrt(adj.sum(-1)) + 1e-10)
             return degree_matrix[:, None] * adj * degree_matrix[None, :]
         elif mode == 'row':
-            degree_matrix = 1. / (adj.sum(-1) + 1e-5)
+            degree_matrix = 1. / (adj.sum(-1) + 1e-10)
         else:
             raise NotImplementedError
         return degree_matrix[:, None] * adj
