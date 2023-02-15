@@ -132,7 +132,17 @@ class cluster_metrics:
         return acc, nmi, f1_macro, adjscore
 
 
-
+def graph_diffusion(adj, k, type='ppr', alpha=0.1):
+    num_nodes = adj.shape[0]
+    if type == 'ppr':
+        adj_ = adj + torch.eye(num_nodes).to(adj.device)
+        degree_ = torch.diag(1./torch.sqrt(adj_.sum(-1))).to(adj.device)
+        H = degree_ @ adj_ @ degree_
+        S = alpha * torch.linalg.inv(torch.eye(num_nodes).to(adj.device) - (1-alpha) * H)
+        S = graph_top_K(S, k)
+        S = (S + S.t()) / 2
+        degree_s = S.sum(0)
+        return S / degree_s
 
 
 
