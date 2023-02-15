@@ -15,9 +15,9 @@ parser = argparse.ArgumentParser(description='SUBLIME')
 
 # Experiment settings
 parser.add_argument('--sparse', action='store_true', help='whether the input is sparse matrix form')
-parser.add_argument('--gsl_mode', type=str, default='structure_refinement',
+parser.add_argument('--gsl_mode', type=str, default='structure_inference',
                     choices=['structure_inference', 'structure_refinement'])
-parser.add_argument('--downstream_task', type=str, default='clustering',
+parser.add_argument('--downstream_task', type=str, default='classification',
                     choices=['classification', 'clustering'])
 parser.add_argument('--dataset', type=str, default='Cora', choices=['Cora'])
 parser.add_argument('--root_path', type=str, default='../datasets')

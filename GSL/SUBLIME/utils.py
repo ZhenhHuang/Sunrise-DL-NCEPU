@@ -22,7 +22,7 @@ def graph_top_K(dense_adj, k):
     _, indices = dense_adj.topk(k=k, dim=-1)
     mask = torch.zeros(dense_adj.shape).bool().to(dense_adj.device)
     mask[torch.arange(dense_adj.shape[0])[:, None], indices] = True
-    sparse_adj = torch.masked_fill(dense_adj, mask, value=0.)
+    sparse_adj = torch.masked_fill(dense_adj, ~mask, value=0.)
     return sparse_adj
 
 
